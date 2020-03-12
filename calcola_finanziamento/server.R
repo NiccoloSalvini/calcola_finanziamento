@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(shinyWidgets)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -19,7 +20,11 @@ shinyServer(function(input, output) {
         bins <- seq(min(x), max(x), length.out = input$bins + 1)
 
         # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
+        hist(x, breaks = bins, col = 'darkgray', border = 'gold')
+        
+        # radio buttons
+        output$value <- renderPrint({ input$radio })
+        
 
     })
 

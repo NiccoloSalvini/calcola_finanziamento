@@ -12,6 +12,10 @@ library(shinyWidgets)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
+    
+    output$cazzo = renderPrint({ input$radio })
+    
+    
 
     output$distPlot <- renderPlot({
 
@@ -24,8 +28,6 @@ shinyServer(function(input, output) {
         
         # radio buttons
         output$value <- renderPrint({ input$radio })
-        
-
     })
 
 })

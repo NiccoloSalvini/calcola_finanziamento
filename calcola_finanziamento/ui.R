@@ -9,6 +9,7 @@ library(rvest)
 library(stringr)
 library(furrr)
 library(purrr)
+library(magrittr)
 
 
 # Define UI for application that draws a histogram

@@ -104,7 +104,9 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                          tableOutput("table"),
                          radioButtons("radio", label = h3("Radio buttons"),
                                       choices = list("Choice 1" = 1, "Choice 2" = 2, "Choice 3" = 3),
-                                      selected = 1))
+                                      selected = 1),
+                         DT::dataTableOutput('tabella')
+                         )
             )
         )
     )

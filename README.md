@@ -1,12 +1,13 @@
 # calcola_finanziamento
-simple shiny tool that computes financial information given the contract (IN ITINERE)
+simple shiny tool that computes financial information given the contract (`IN ITINERE`)
+
+---
+
+_this is has already been deployed even thougt it is not completed_
+----> deployment happens [`HERE`](http://niccolosalvini.shinyapps.io/calcola_finanziamento)
 
 
-
-## **IN ITINERE DEVELOPMENT PROJECT**
-
-
-
+###Road map:
 ### cosa voglio creare, per punti:
 
 - far vedere come è strutturato il finanziamento 

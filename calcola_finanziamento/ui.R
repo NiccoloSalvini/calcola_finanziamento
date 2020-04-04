@@ -12,11 +12,12 @@ library(purrr)
 library(magrittr)
 library(shinyWidgets)
 library(tidyverse)
-
+library(shinydashboard)
+library(vroom)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme = shinytheme("cerulean"),
-
+    
     # Application title
     titlePanel("Ti Spiego il Finanziamento APP"),
 
@@ -25,9 +26,12 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
         sidebarPanel(
             
             helpText("Riempi le caselle coi principali dati del finanziamento"),
-            numericInput(inputId = "entita_finanziamento", label = h3("Entità del finanziamento"), value = 20000),
+            numericInput(inputId = "entita_finanziamento",
+                         label = h3("Entità del finanziamento"), 
+                         value = 20000) ,
             
-            selectInput("selection", h3("Che tipo di Ammortamento?"), 
+            selectInput("selection", 
+                        label = h3("Che tipo di Ammortamento?"), 
                         choices = c("Ammortamento alla Italiana", "Ammortamento alla Francese")),
             
             conditionalPanel(
@@ -35,7 +39,6 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                 helpText("> L'ammortamento alla Italiana prevede
                          quote capitali costanti <"),
                 
-                    
                 numericInput(inputId = "anniit", label = "Anni rimborso", value = 10),
                 radioButtons("rateit", label = h3("Tipo di Rate"),
                              choices = list("Mensile" = 1, "Trimestrale" = 2, "Semestrale" = 3, "Annuale" = 4),
@@ -110,7 +113,9 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                          p("here I am rendering the data table"),
                          strong('on a left input basis'),
                          hr(),
-                         DT::dataTableOutput('tabella')
+                         DT::dataTableOutput('tabella'),
+                         hr(),
+                         downloadButton("Download", "Download .csv")
                          )
             )
         )

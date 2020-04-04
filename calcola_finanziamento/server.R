@@ -24,10 +24,10 @@ shinyServer(function(input, output, session) {
     
             # draw the histogram with the specified number of bins
             hist(x, breaks = bins, col = 'darkgray', border = 'gold')
-        
-    # qui renderizza la tabella sulla base degli input, prima lo faccio senza 
-    # gli input dello user
             
+            
+            # qui renderizza la tabella sulla base degli input, prima lo faccio senza 
+            # gli input dello user
             output$tabella = DT::renderDataTable({
                 
                 
@@ -42,15 +42,27 @@ shinyServer(function(input, output, session) {
                     append(FALSE, after =0)
                 rata = quota_capitale + quota_interessi
                 
-                data = tibble(tasso = rep(tasso,anni_rim +1),
+                dt = tibble(tasso = rep(tasso,anni_rim +1),
                               quota_capitale = rep(quota_capitale,anni_rim+1),
                               debito_residuo = debito_residuo,
                               quota_interessi= quota_interessi[-length(quota_interessi)],
                               rata = rata[-length(rata)]
                 )
                               
-                DT::datatable(data = data, options = list(orderClasses = TRUE))
+                DT::datatable(data = dt, 
+                              options = list(orderClasses = TRUE))
             })
+            
+            #qui metto la parte del download della struttura del prestito
+            
+            output$Download <- downloadHandler(
+                filename = function() {
+                    paste0(output$tabella, Sys.Date(), ".csv")
+                },
+                content = function(file) {
+                    vroom::vroom_write(output$tabella, file)
+                }
+            )
             
         
         

@@ -1,0 +1,12 @@
+name: calcola_finanziamento
+title: calcola_finanziamento
+username:
+account: niccolosalvini
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2056353
+bundleId: 2968303
+url: https://niccolosalvini.shinyapps.io/calcola_finanziamento/
+when: 1586006205.81534
+asMultiple: FALSE
+asStatic: FALSE

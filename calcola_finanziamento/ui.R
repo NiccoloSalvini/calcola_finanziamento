@@ -10,6 +10,8 @@ library(stringr)
 library(furrr)
 library(purrr)
 library(magrittr)
+library(shinyWidgets)
+library(tidyverse)
 
 
 # Define UI for application that draws a histogram
@@ -23,7 +25,7 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
         sidebarPanel(
             
             helpText("Riempi le caselle coi principali dati del finanziamento"),
-            numericInput(inputId = "ent", label = h3("Entità del finanziamento"), value = 20000),
+            numericInput(inputId = "entita_finanziamento", label = h3("Entità del finanziamento"), value = 20000),
             
             selectInput("selection", h3("Che tipo di Ammortamento?"), 
                         choices = c("Ammortamento alla Italiana", "Ammortamento alla Francese")),
@@ -67,10 +69,6 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                         min = 1,
                         max = 50,
                         value = 30),
-            
-            radioButtons("radio", label = h3("Numerino sotto Plot"),
-                         choices = list("Choice 1" = 1, "Choice 2" = 2, "Choice 3" = 3),
-                         selected = 1),
             hr(),
             hr()
             #fluidRow(column(3, verbatimTextOutput("value")))
@@ -98,13 +96,20 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                          p("span does the same thing as div, but it works with",
                            span("groups of words", style = "color:blue"),
                            "that appear inside a paragraph."),
+                         p('some summary mathematics information about what is behind this',
+                           span("here it goes l'ammortamento all'italiana preve quote capitali costanti")),
+                         withMathJax(),
+                         helpText('$$Quota Capitale =  \\frac{Entità Finanziamento}{Numero di Rate}$$'),
+                         helpText('$$QuotaInteressi_{t} =  QuotaCapitale_{t-1}\\cdot Tasso$$'),
+                         helpText('$$Debito Residuo_{t} =  EntitàFinanziamento - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
+                         helpText('$$Rata_{t} = QuotaCapitale_{t} + Quota Interessi_{t}$$')
                          ),
                 #qui si crea la terza tab e ci metto le tabelle da esportare
                 tabPanel("Table", 
                          tableOutput("table"),
-                         radioButtons("radio", label = h3("Radio buttons"),
-                                      choices = list("Choice 1" = 1, "Choice 2" = 2, "Choice 3" = 3),
-                                      selected = 1),
+                         p("here I am rendering the data table"),
+                         strong('on a left input basis'),
+                         hr(),
                          DT::dataTableOutput('tabella')
                          )
             )

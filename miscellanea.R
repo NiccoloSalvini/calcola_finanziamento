@@ -20,7 +20,6 @@ quota_interessi = tasso * debito_residuo %>%
 rata = quota_capitale + quota_interessi
 
 data = tibble(tasso = rep(tasso,9),
-            n_rata = 0:numero_rata+1,
             quota_capitale = rep(quota_capitale,9),
             debito_residuo = debito_residuo,
             quota_interessi= quota_interessi[-length(quota_interessi)],
@@ -42,9 +41,3 @@ data = tibble(tasso = rep(tasso,9),
 # capitale_residuo = entita_fin  /  c(0,cumsum(1+tasso))
 # capitale_residuo = capitale_residuo[-length(capitale_residuo)]
 # quota_interessi = capitale_residuo*tasso
-dt = tibble(tasso = tassos,
-            n_rata = anni_rim,
-            cpt_res = cpt_res,
-            quota_cpt = quota_capitale,
-            capitale_residuo = capitale_residuo[-length(capitale_residuo)])
-

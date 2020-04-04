@@ -18,12 +18,24 @@ shinyServer(function(input, output, session) {
         # qui renderizza il plot della distributizone    
         output$distPlot <- renderPlot({
     
-            # generate bins based on input$bins from ui.R
-            x    <- faithful[, 2]
-            bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-            # draw the histogram with the specified number of bins
-            hist(x, breaks = bins, col = 'darkgray', border = 'gold')
+            tasso = input$tassoit
+            entita_fin = input$entita_finanziamento
+            anni_rim = input$anniit
+            tipo_amm = c('all\'italiana', 'alla francese')
+            quota_capitale = entita_fin/anni_rim
+            quota_interessi = quota_capitale * tasso
+            debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,anni_rim))))
+            quota_interessi = tasso * debito_residuo %>% 
+                append(FALSE, after =0)
+            rata = quota_capitale + quota_interessi
+            
+            dt = tibble(tasso = rep(tasso,anni_rim +1),
+                        quota_capitale = rep(quota_capitale,anni_rim+1),
+                        debito_residuo = debito_residuo,
+                        quota_interessi= quota_interessi[-length(quota_interessi)],
+                        rata = rata[-length(rata)]
+            )
+            hist(dt$tasso,dt$debito_residuo)
             
             
             # qui renderizza la tabella sulla base degli input, prima lo faccio senza 
@@ -57,10 +69,10 @@ shinyServer(function(input, output, session) {
             
             output$Download <- downloadHandler(
                 filename = function() {
-                    paste0(output$tabella, Sys.Date(), ".csv")
+                    paste0(, Sys.Date(), ".csv")
                 },
                 content = function(file) {
-                    vroom::vroom_write(output$tabella, file)
+                    vroom::vroom_write(, file)
                 }
             )
             

@@ -85,13 +85,14 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
             tabsetPanel(
                 #qui si crea la prima tab e ci metto i plots
                 tabPanel("Plot",
-                         plotOutput("distPlot")
+                         plotOutput("distPlot"),
+                         icon = icon('drafting-compass')
                          ),
                 
                 #qui si crea la seconda tab e ci metto le informazioni discorsive
-                tabPanel("Summary",
-                         icon = icon('calendar'),
-                         verbatimTextOutput("summary"),
+                tabPanel("Financial Math basis",
+                         icon = icon('square-root-alt'),
+                         verbatimTextOutput("square-root-alt"),
                          hr(),
                          # qui con MathJAx butto giù le formule di tutti e due gli ammortamenti
                          # qui all'ITALIANA
@@ -124,16 +125,16 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                          ),
                 
                 #qui si crea la terza tab e ci metto le tabelle da esportare1
-                tabPanel("Plot", 
-                         tableOutput("table"),
-                         p("here I am rendering the data table"),
-                         strong('on a left input basis'),
+                tabPanel("dataset", 
+                         icon = icon('table'),
+                         p(em('Term structure of the financial operation
+                              base on the', strong('left side'), em('inputs'))),
                          hr(),
-                         DT::dataTableOutput('tabella'),
+                         DT::dataTableOutput('dataset'),
                          hr(),
                          downloadButton(outputId ="Download",
                                         label = "Download .csv",
-                                        class = "btn-success")
+                                        class = "btn-secondary")
                          )
             )
         )

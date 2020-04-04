@@ -40,7 +40,7 @@ shinyServer(function(input, output, session) {
             
             # qui renderizza la tabella sulla base degli input, prima lo faccio senza 
             # gli input dello user
-            output$tabella = DT::renderDataTable({
+            output$dataset = DT::renderDataTable({
                 
                 
                 tasso = input$tassoit

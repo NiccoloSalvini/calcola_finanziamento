@@ -9,8 +9,11 @@ _this is has already been deployed even thougt it is not completed_
 ### some snapshots from the _APP_
 
 ![img1](snaps/img1.PNG)
+---
 ![img1](snaps/img2.PNG)
+---
 ![img1](snaps/img3.PNG)
+---
 ![img1](snaps/img4.PNG)
 
 

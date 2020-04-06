@@ -14,41 +14,52 @@ library(shinyWidgets)
 library(tidyverse)
 library(shinydashboard)
 library(vroom)
+library(janitor)
+library(purrr)
+
+
+
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(theme = shinytheme("cerulean"),
     
     # Application title
-    titlePanel("Ti Spiego il Finanziamento APP",
+    titlePanel(title = "Ti Spiego il Finanziamento",
                windowTitle = 'CalFin APP'),
 
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
             
-            helpText("Riempi le caselle coi principali dati del finanziamento"),
+
             numericInput(inputId = "entita_finanziamento",
-                         label = h3("Entità del finanziamento"), 
+                         label = h3("Entità finanziamento"), 
                          value = 20000),
             
             selectInput("selection", 
                         label = h3("Che tipo di Ammortamento?"), 
                         choices = c("Ammortamento alla Italiana", "Ammortamento alla Francese")),
+            
             # condizionale all'ITALIANA
-            conditionalPanel(
+            conditionalPanel( 
                 condition = "input.selection == 'Ammortamento alla Italiana'",
-                helpText("> L'ammortamento alla Italiana prevede quote capitali costanti <"),
+                helpText(strong("> L'ammortamento alla Italiana prevede quote capitali costanti <")),
                 
-                numericInput(inputId = "anniit",
-                             label = "Anni rimborso", 
-                             value = 10),
-                
-                radioButtons("rateit",
-                             label = h3("Tipo di Rate"),
-                             choices = list("Mensile" = 1, "Trimestrale" = 2, "Semestrale" = 3, "Annuale" = 4),
+                # parti anno per fin
+                radioButtons("PAit",
+                             label = h3("Parti d'Anno"),
+                             choices = list("Mensile" = 12, "Trimestrale" = 4, 'Quadrimestrale' = 3,
+                                            "Semestrale" = 2, "Annuale" = 1),
                              selected = 1),
                 
-                numericInput(inputId = "tassoit", label = h3("Tasso di Interesse"),
+                # numero di anni che dura finanziamento
+                numericInput("ANNIit",
+                             label = h3("N° Anni"),
+                             value = 10),
+                
+                # tasso che posso valutare di spostare fuori dal conditional 
+                numericInput(inputId = "tassoit", 
+                             label = h3("Tasso di Interesse"),
                              value = 1.55,
                              min = -1,
                              max = 10,
@@ -63,8 +74,9 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                 
                 radioButtons("PAfr",
                              label = h3("Parti d'Anno"),
-                             choices = list("Mensile" = 1, "Trimestrale" = 2, "Semestrale" = 3, "Annuale" = 4),
-                             selected = 4),
+                             choices = list("Mensile" = 12, "Trimestrale" = 4,'Quadrimestrale' = 3, 
+                                            "Semestrale" = 2, "Annuale" = 1),
+                             selected = 1),
                 
                 numericInput("ANNIfr",
                              label = h3("N° Anni"),
@@ -101,6 +113,9 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                                   prevede che ciascuna quota di ammortamento (supposto che le rate siano equintervallate ed n sia il numero di periodi previsti per l'ammortamento) 
                                   sia costante e pagata in via posticipata."),
                          withMathJax(),
+                         helpText('$$A = NumeroAnni$$'),
+                         helpText('$$PA = PartiAnno$$'),
+                         helpText('$$Numero di Rate = PartiAnno \\cdot NumeroAnni$$'),
                          helpText('$$Quota Capitale =  \\frac{Entità Finanziamento}{Numero di Rate}$$'),
                          helpText('$$QuotaInteressi_{t} =  QuotaCapitale_{t-1}\\cdot Tasso$$'),
                          helpText('$$Debito Residuo_{t} =  EntitàFinanziamento - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
@@ -125,18 +140,31 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                          ),
                 
                 #qui si crea la terza tab e ci metto le tabelle da esportare1
-                tabPanel("dataset", 
+                tabPanel("Dataset", 
                          icon = icon('table'),
                          p(em('Term structure of the financial operation
                               base on the', strong('left side'), em('inputs'))),
                          hr(),
-                         DT::dataTableOutput('dataset'),
+                         DT::dataTableOutput('Dataset'),
                          hr(),
                          downloadButton(outputId ="Download",
                                         label = "Download .csv",
                                         class = "btn-secondary")
-                         )
-            )
+                         ),
+                # qui faccio vedere i tassi di confronto EURIBOR 
+                tabPanel("Tassi", 
+                         icon = icon('sort-numeric-down'),
+                         p(strong("EURIBOR")),
+                         p(em("E' Tasso interbancario di riferimento diffuso giornalmente dalla Federazione Bancaria Europea come media ponderata dei
+                              tassi di interesse ai quali le Banche operanti nell'Unione Europea cedono i depositi in prestito.
+                              È utilizzato come parametro di indicizzazione dei mutui ipotecari a tasso variabile.")),
+                         strong('Questa tabella è aggiornata dinamicamente con cadenza giornaliera'),
+                         p(),
+                         em('Ultimo aggioramento alla data:', Sys.Date()),
+                         hr(),
+                         DT::dataTableOutput('Tassi')
+                         
+                        )
         )
     )
-))
+)))

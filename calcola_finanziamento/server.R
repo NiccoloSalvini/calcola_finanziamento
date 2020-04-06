@@ -20,17 +20,18 @@ shinyServer(function(input, output, session) {
     
             tasso = input$tassoit
             entita_fin = input$entita_finanziamento
-            anni_rim = input$anniit
+            PAit = input$PAit
+            num_ann = input$ANNIit
             tipo_amm = c('all\'italiana', 'alla francese')
-            quota_capitale = entita_fin/anni_rim
+            quota_capitale = entita_fin/num_ann
             quota_interessi = quota_capitale * tasso
-            debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,anni_rim))))
+            debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_ann))))
             quota_interessi = tasso * debito_residuo %>% 
                 append(FALSE, after =0)
             rata = quota_capitale + quota_interessi
             
-            dt = tibble(tasso = rep(tasso,anni_rim +1),
-                        quota_capitale = rep(quota_capitale,anni_rim+1),
+            dt = tibble(tasso = rep(tasso,num_ann +1),
+                        quota_capitale = rep(quota_capitale,num_ann+1),
                         debito_residuo = debito_residuo,
                         quota_interessi= quota_interessi[-length(quota_interessi)],
                         rata = rata[-length(rata)]
@@ -40,22 +41,24 @@ shinyServer(function(input, output, session) {
             
             # qui renderizza la tabella sulla base degli input, prima lo faccio senza 
             # gli input dello user
-            output$dataset = DT::renderDataTable({
+            output$Dataset = DT::renderDataTable({
                 
                 
                 tasso = input$tassoit
                 entita_fin = input$entita_finanziamento
-                anni_rim = input$anniit
+                PAit = as.numeric(input$PAit)
+                num_ann = input$ANNIit
+                num_rate = PAit * num_ann
                 tipo_amm = c('all\'italiana', 'alla francese')
-                quota_capitale = entita_fin/anni_rim
+                quota_capitale = entita_fin/num_rate
                 quota_interessi = quota_capitale * tasso
-                debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,anni_rim))))
+                debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
                 quota_interessi = tasso * debito_residuo %>% 
                     append(FALSE, after =0)
                 rata = quota_capitale + quota_interessi
                 
-                dt = tibble(tasso = rep(tasso,anni_rim +1),
-                              quota_capitale = rep(quota_capitale,anni_rim+1),
+                dt = tibble(tasso = rep(tasso,num_rate +1),
+                              quota_capitale = rep(quota_capitale,num_rate+1),
                               debito_residuo = debito_residuo,
                               quota_interessi= quota_interessi[-length(quota_interessi)],
                               rata = rata[-length(rata)]
@@ -69,12 +72,46 @@ shinyServer(function(input, output, session) {
             
             output$Download <- downloadHandler(
                 filename = function() {
-                    paste0(, Sys.Date(), ".csv")
+                    paste0(output$Dataset, Sys.Date(), ".csv")
                 },
                 content = function(file) {
-                    vroom::vroom_write(, file)
+                    vroom::vroom_write(output$Dataset, file)
                 }
             )
+            
+            
+            output$Tassi = DT::renderDataTable({
+                
+                url = 'https://mutuionline.24oreborsaonline.ilsole24ore.com/guide-mutui/euribor.asp'
+                VettoreTasso = url  %>%
+                    read_html(verbose = 1) %>%
+                    html_nodes('.tabellaosservatorio:nth-child(5) td:nth-child(3) , .tabellaosservatorio:nth-child(5) 
+                               td:nth-child(2) , .tabellaosservatorio:nth-child(5) td:nth-child(1)') %>% 
+                    html_text() %>%
+                    str_squish()
+                
+                # initialize matrix
+                tab = matrix(VettoreTasso, ncol = 3,nrow = 5 ,byrow  = T)
+                
+                # creation of the tibble
+                tab = tab %>%
+                    as.tibble() %>% 
+                    set_names(tab[1,]) %>% 
+                    slice(-1)
+                
+                # fixing col types
+                tab$Fixing = tab$Fixing %>% 
+                    str_replace_all('\\%','') %>% 
+                    str_replace_all('\\,','.') %>%
+                    as.numeric()
+                    
+                tab$Data = tab$Data %>% 
+                    dmy()
+                
+                DT::datatable(data = tab, 
+                              options = list(orderClasses = TRUE))        
+                
+                    })
             
         
         

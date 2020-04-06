@@ -21,11 +21,10 @@ library(purrr)
 
 
 # Define UI for application that draws a histogram
-shinyUI(fluidPage(theme = shinytheme("cerulean"),
-    
-    # Application title
-    titlePanel(title = "Ti Spiego il Finanziamento",
-               windowTitle = 'CalFin APP'),
+shinyUI(
+    fluidPage(theme = shinytheme("cerulean"),
+              titlePanel(title=div(img(src="soldi.PNG"),
+                                   "Ti Spiego il Finanziamento")),
 
     # Sidebar with a slider input for number of bins
     sidebarLayout(
@@ -108,7 +107,7 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                          hr(),
                          # qui con MathJAx butto giù le formule di tutti e due gli ammortamenti
                          # qui all'ITALIANA
-                         p(strong("All'ITALIANA"), style = 'color:blue'),
+                         p(h2(strong("All'ITALIANA")), style = 'color:blue'),
                          helpText("L'ammortamento con quote capitali costanti (ammortamento italiano) 
                                   prevede che ciascuna quota di ammortamento (supposto che le rate siano equintervallate ed n sia il numero di periodi previsti per l'ammortamento) 
                                   sia costante e pagata in via posticipata."),
@@ -123,7 +122,7 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                          hr(),
                          
                          # qui all'FRANCESE 
-                         p(strong("Alla FRANCESE"), style = 'color:red'),
+                         p(h2(strong("Alla FRANCESE")), style = 'color:red'),
                          helpText("L'ammortamento francese prevede che le rate siano posticipate e che la somma ricevuta dal debitore all'inizio (t = 0) sia il valore attuale di una rendita a rate costanti. Ciascuna rata è comprensiva di
                          parte del capitale (quota capitale) ed i relativi interessi (quota interessi) calcolati sul
                                   capitale residuo non ancora restituito (debito residuo). Tale metodo è alternativo ai metodi di calcolocon rata anticipata e ai metodi italiano e tedesco a quota capitale costante e rata variabile."),
@@ -154,7 +153,7 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                 # qui faccio vedere i tassi di confronto EURIBOR 
                 tabPanel("Tassi", 
                          icon = icon('sort-numeric-down'),
-                         p(strong("EURIBOR")),
+                         p(h1(strong("EURIBOR"))),
                          p(em("E' Tasso interbancario di riferimento diffuso giornalmente dalla Federazione Bancaria Europea come media ponderata dei
                               tassi di interesse ai quali le Banche operanti nell'Unione Europea cedono i depositi in prestito.
                               È utilizzato come parametro di indicizzazione dei mutui ipotecari a tasso variabile.")),
@@ -162,9 +161,13 @@ shinyUI(fluidPage(theme = shinytheme("cerulean"),
                          p(),
                          em('Ultimo aggioramento alla data:', Sys.Date()),
                          hr(),
-                         DT::dataTableOutput('Tassi')
+                         DT::dataTableOutput('Tassi'),
+                         hr(),
+                         helpText("Qui vedi l'evoluzione del tasso")
                          
                         )
         )
     )
-)))
+    )
+    )
+    )

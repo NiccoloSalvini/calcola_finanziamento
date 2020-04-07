@@ -163,7 +163,13 @@ shinyUI(
                          hr(),
                          DT::dataTableOutput('Tassi'),
                          hr(),
-                         helpText("Qui vedi l'evoluzione del tasso")
+                         # qui dentro plotly
+                         selectizeInput(
+                             inputId = "tuttitassi", 
+                             label = h1("Seleziona Serie Storica Tasso"),
+                             choices = c('AlGiorno', 'AlMese', 'AllAnno')
+                         ),
+                         plotlyOutput(outputId = "p")
                         )
         )
     )

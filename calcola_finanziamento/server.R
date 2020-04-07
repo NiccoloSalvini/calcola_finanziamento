@@ -117,6 +117,68 @@ shinyServer(function(input, output, session) {
             output$tab = renderUI({
                 tagList("Here the source:", REF1)
             })
+            
+            
+            output$p = renderPlotly({
+                
+                
+                url1 = 'https://www.euribor-rates.eu/it/tassi-euribor-aggiornati/2/euribor-tasso-3-mesi/'
+                css = '.col-lg-4 .card-body'
+                Names = c('Data','Tasso')
+
+                # prendo tabellone con tutti e tre dataset  
+                tabellone = url1 %>%
+                    read_html() %>% 
+                    html_table()
+                
+                # qui prendo la sublist [[1]] che corrisponde ai dati al giorno
+                # e pulisco togliendo percentuale e converto a data
+                AlGiorno = tabellone[[1]] %>% 
+                    as_tibble() %>%
+                    set_names(Names)
+                
+                AlGiorno$Data = AlGiorno$Data %>% 
+                    dmy()
+                
+                AlGiorno$Tasso = AlGiorno$Tasso %>%
+                    str_replace_all('\\%','') %>% 
+                    str_replace_all('\\,','.') %>%
+                    as.numeric()
+                
+                # qui prendo la sublist [[2]] che corrisponde ai dati al mese
+                # e pulisco togliendo percentuale e converto a data
+                AlMese = tabellone[[2]] %>% 
+                    as_tibble() %>% 
+                    set_names(Names)
+                
+                AlMese$Data = AlMese$Data %>% 
+                    dmy()
+                
+                AlMese$Tasso = AlMese$Tasso %>%
+                    str_replace_all('\\%','') %>% 
+                    str_replace_all('\\,','.') %>%
+                    as.numeric()
+                
+                
+                # qui prendo la sublist [[3]] che corrisponde ai dati al anno
+                # e pulisco togliendo percentuale e converto a data
+                AllAnno = tabellone[[3]] %>%
+                    as_tibble() %>% 
+                    set_names(Names)
+                
+                AllAnno$Data = AllAnno$Data %>% 
+                    dmy()
+                
+                AllAnno$Tasso = AllAnno$Tasso %>%
+                    str_replace_all('\\%','') %>% 
+                    str_replace_all('\\,','.') %>%
+                    as.numeric()
+                
+                plot_ly(AlMese, 
+                        x = ~Data, 
+                        y = ~Tasso) %>% 
+                    add_lines()
+            })
         
         })
         

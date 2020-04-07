@@ -88,13 +88,13 @@ tabellone = url1 %>%
 # qui prendo la sublist [[1]] che corrisponde ai dati al giorno
 # e pulisco togliendo percentuale e converto a data
 algiorno = tabellone[[1]] %>% 
-  as_tibble() %>% 
+  as_tibble() %>%
   set_names(NamesGio)
 
 algiorno$Data = algiorno$Data %>% 
   dmy()
 
-algiorno$Tasso = algiorno$TassoGio %>%
+algiorno$TassoGio = algiorno$TassoGio %>%
   str_replace_all('\\%','') %>% 
   str_replace_all('\\,','.') %>%
   as.numeric()
@@ -108,7 +108,7 @@ almese = tabellone[[2]] %>%
 almese$Data = almese$Data %>% 
   dmy()
 
-almese$Tasso = almese$TassoMes %>%
+almese$TassoMes = almese$TassoMes %>%
   str_replace_all('\\%','') %>% 
   str_replace_all('\\,','.') %>%
   as.numeric()
@@ -123,7 +123,7 @@ allanno = tabellone[[3]] %>%
 allanno$Data = allanno$Data %>% 
   dmy()
 
-allanno$Tasso = allanno$TassoAnn %>%
+allanno$TassoAnn = allanno$TassoAnn %>%
   str_replace_all('\\%','') %>% 
   str_replace_all('\\,','.') %>%
   as.numeric()

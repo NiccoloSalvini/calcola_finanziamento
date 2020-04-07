@@ -23,14 +23,14 @@ library(purrr)
 # Define UI for application that draws a histogram
 shinyUI(
     fluidPage(theme = shinytheme("cerulean"),
-              titlePanel(title=div(img(src="soldi.PNG"),
+              titlePanel(title=div(img(src="https://www.facile.it/img_a/zuzu/bianche/soldi_big.png",
+                                       height = '15%',
+                                       width = '15%'),
                                    "Ti Spiego il Finanziamento")),
 
-    # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
             
-
             numericInput(inputId = "entita_finanziamento",
                          label = h3("Entità finanziamento"), 
                          value = 20000),
@@ -158,13 +158,12 @@ shinyUI(
                               tassi di interesse ai quali le Banche operanti nell'Unione Europea cedono i depositi in prestito.
                               È utilizzato come parametro di indicizzazione dei mutui ipotecari a tasso variabile.")),
                          strong('Questa tabella è aggiornata dinamicamente con cadenza giornaliera'),
-                         p(),
                          em('Ultimo aggioramento alla data:', Sys.Date()),
+                         p(uiOutput("tab")),
                          hr(),
                          DT::dataTableOutput('Tassi'),
                          hr(),
                          helpText("Qui vedi l'evoluzione del tasso")
-                         
                         )
         )
     )

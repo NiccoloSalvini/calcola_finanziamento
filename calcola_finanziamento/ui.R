@@ -26,7 +26,7 @@ shinyUI(
               titlePanel(title=div(img(src="https://www.facile.it/img_a/zuzu/bianche/soldi_big.png",
                                        height = '15%',
                                        width = '15%'),
-                                   "Ti Spiego il Finanziamento")),
+                                   "Ti Spiego il Finanziamento NICCO")),
 
     sidebarLayout(
         sidebarPanel(

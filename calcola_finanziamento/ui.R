@@ -26,29 +26,35 @@ shinyUI(
               titlePanel(title=div(img(src="https://www.facile.it/img_a/zuzu/bianche/soldi_big.png",
                                        height = '15%',
                                        width = '15%'),
-                                   "Ti Spiego il Finanziamento NICCO")),
+                                   "Ti Spiego il Finanziamento")),
 
     sidebarLayout(
         sidebarPanel(
             
             numericInput(inputId = "entita_finanziamento",
-                         label = h3("Entità finanziamento"), 
-                         value = 20000),
+                         label = h3("Entità Finanziamento"), 
+                         value = 20000,
+                         step = 100),
             
             selectInput("selection", 
                         label = h3("Che tipo di Ammortamento?"), 
                         choices = c("Ammortamento alla Italiana", "Ammortamento alla Francese")),
             
+            selectInput("selectionRegime", 
+                        label = h3("Che tipo di Regime?"), 
+                        choices = c("Regime Interesse Semplice", "Regime Interesse Composto")),
+            
             # condizionale all'ITALIANA
             conditionalPanel( 
-                condition = "input.selection == 'Ammortamento alla Italiana'",
-                helpText(strong("> L'ammortamento alla Italiana prevede quote capitali costanti <")),
+                condition = "input.selection == 'Ammortamento alla Italiana' || input.selectionRegime == 'Regime Interesse Semplice'",
+                helpText(em("> Ammortamento selezionato:"),strong("All'Italiana")),
+                helpText(em("> Regime Interessi:"),strong("Semplice")),
                 
                 # parti anno per fin
                 radioButtons("PAit",
                              label = h3("Parti d'Anno"),
-                             choices = list("Mensile" = 12, "Trimestrale" = 4, 'Quadrimestrale' = 3,
-                                            "Semestrale" = 2, "Annuale" = 1),
+                             choices = list("Mensile" = 1/12, "Trimestrale" = 1/4, 'Quadrimestrale' = 1/3,
+                                            "Semestrale" = 1/2, "Annuale" = 1),
                              selected = 1),
                 
                 # numero di anni che dura finanziamento
@@ -58,7 +64,7 @@ shinyUI(
                 
                 # tasso che posso valutare di spostare fuori dal conditional 
                 numericInput(inputId = "tassoit", 
-                             label = h3("Tasso di Interesse"),
+                             label = h3("Tasso di Interesse in %"),
                              value = 1.55,
                              min = -1,
                              max = 10,
@@ -73,8 +79,8 @@ shinyUI(
                 
                 radioButtons("PAfr",
                              label = h3("Parti d'Anno"),
-                             choices = list("Mensile" = 12, "Trimestrale" = 4,'Quadrimestrale' = 3, 
-                                            "Semestrale" = 2, "Annuale" = 1),
+                             choices = list("Mensile" =1/12, "Trimestrale" = 1/4,'Quadrimestrale' = 1/3, 
+                                            "Semestrale" = 1/2, "Annuale" = 1),
                              selected = 1),
                 
                 numericInput("ANNIfr",
@@ -82,7 +88,8 @@ shinyUI(
                              value = 10),
                 
                 
-                numericInput(inputId = "tassofr", label = h3("Tasso di Interesse"), 
+                numericInput(inputId = "tassofr",
+                             label = h3("Tasso di Interesse %"), 
                              value = 1.55,
                              min = -1,
                              max = 10,

@@ -16,7 +16,7 @@ shinyServer(function(input, output, session) {
     observe({
         
         # qui renderizza il plot della distributizone    
-        output$distPlot <- renderPlot({
+        output$distPlot = renderPlot({
     
             tasso = input$tassoit
             entita_fin = input$entita_finanziamento
@@ -43,62 +43,77 @@ shinyServer(function(input, output, session) {
             # gli input dello user
             output$Dataset = DT::renderDataTable({
                 
-                if (input$selection == "Ammortamento alla Italiana") {
-                    tasso = (input$tassoit)/100
+                if (input$selection == "Ammortamento alla Italiana" & input$selectionRegime == "Regime Interesse Semplice") {
+                    TassoAnnuale = (input$tassoit)/100
                     entita_fin = input$entita_finanziamento
                     PAit = as.numeric(input$PAit)
                     num_ann = input$ANNIit
-                    num_rate = PAit * num_ann
+                    TassoInfra = TassoAnnuale * PAit
+                    num_rate = (PAit)^-1 * num_ann
                     quota_capitale = entita_fin/num_rate
-                    quota_interessi = quota_capitale * tasso/100
                     debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
-                    quota_interessi = tasso * debito_residuo %>% 
+                    quota_interessi = TassoInfra * debito_residuo %>% 
                         append(FALSE, after =0)
                     rata = quota_capitale + quota_interessi
+                    rata = rata[-length(rata)]
+                    totale_interessi = sum(quota_interessi)
+                    totale_rata = sum(rata)
+                    dt = tibble(TassoInfra = round(rep(TassoInfra,num_rate +1),4),
+                                AnnoCorrente = rep(1:num_ann,len = num_rate+1, each = (PAit)^-1 ),
+                                quota_capitale = round(rep(quota_capitale,num_rate+1),2),
+                                debito_residuo = round(debito_residuo,2),
+                                quota_interessi= round(quota_interessi[-length(quota_interessi)],2),
+                                rata = round(rata,2))
                     
-                    dt = tibble(tasso = rep(tasso,num_rate +1),
-                                quota_capitale = rep(quota_capitale,num_rate+1),
-                                debito_residuo = debito_residuo,
-                                quota_interessi= quota_interessi[-length(quota_interessi)],
-                                rata = rata[-length(rata)]
-                    )
+                    # Qui trasformo la prima riga
+                    # di modo che sia coerente col Fin
+                    dt[1,] = 0 
+                    dt[1,4] = entita_fin
+                    
                     DT::datatable(data = dt,
                                   filter = 'none',
-                                  caption = tags$caption("Struttura Finanaziamento dell'Amm Italiano "),
+                                  caption = tags$caption("Struttura Amm Ita Sem "),
                                   rownames = T,
                                   options = list(orderClasses = TRUE,
                                                  scrollCollapse = T,
                                                  pageLength = 20)
                                   )    
                 }
-                else {
+                else if (input$selection == "Ammortamento alla Italiana" & input$selectionRegime == "Regime Interesse Composto") {
                     
-                    tasso = input$tassofr
+                    TassoAnnuale = (input$tassoit)/100
                     entita_fin = input$entita_finanziamento
-                    PAfr = as.numeric(input$PAfr)
-                    num_ann = input$ANNIfr
-                    num_rate = PAfr * num_ann
+                    PAit = as.numeric(input$PAit)
+                    num_ann = input$ANNIit
+                    TassoInfra = (1+ TassoAnnuale)^PAit -1
+                    num_rate = (PAit)^-1 * num_ann
                     quota_capitale = entita_fin/num_rate
-                    quota_interessi = quota_capitale * tasso
                     debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
-                    quota_interessi = tasso * debito_residuo %>% 
+                    quota_interessi = TassoInfra * debito_residuo %>% 
                         append(FALSE, after =0)
                     rata = quota_capitale + quota_interessi
+                    rata = rata[-length(rata)]
+                    totale_interessi = sum(quota_interessi)
+                    totale_rata = sum(rata)
+                    dt = tibble(TassoInfra = round(rep(TassoInfra,num_rate +1),4),
+                                AnnoCorrente = rep(1:num_ann,len = num_rate+1, each = (PAit)^-1 ),
+                                quota_capitale = round(rep(quota_capitale,num_rate+1),2),
+                                debito_residuo = round(debito_residuo,2),
+                                quota_interessi= round(quota_interessi[-length(quota_interessi)],2),
+                                rata = round(rata,2))
                     
-                    dt = tibble(tasso = rep(tasso,num_rate +1),
-                                quota_capitale = rep(quota_capitale,num_rate+1),
-                                debito_residuo = debito_residuo,
-                                quota_interessi= quota_interessi[-length(quota_interessi)],
-                                rata = rata[-length(rata)])
+                    # Qui trasformo la prima riga
+                    # di modo che sia coerente col Fin
+                    dt[1,] = 0 
+                    dt[1,4] = entita_fin
                     
                     DT::datatable(data = dt,
                                   filter = 'none',
-                                  caption = tags$caption("Struttura Finanaziamento dell'Amm Francese"),
+                                  caption = tags$caption("Struttura Amm Ita Comp"),
                                   rownames = T,
                                   options = list(orderClasses = TRUE,
                                                  scrollCollapse = T,
-                                                 pageLength = 20)
-                    ) 
+                                                 pageLength = 20)) 
                     
                 }
                 

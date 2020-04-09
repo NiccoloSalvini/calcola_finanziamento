@@ -11,53 +11,29 @@ header.true <- function(df) {
   df[-1,]
 }
 
-tasso = 0.003
-entita_fin = 5000
-anni_rim = 8
-numero_rata = 8 
-tipo_amm = c('all\'italiana', 'alla francese')
-quota_capitale = entita_fin/anni_rim
-quota_interessi = quota_capitale * tasso
-debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,8))))
-quota_interessi = tasso * debito_residuo %>% 
+TassoAnnuale = 10/100
+entita_fin = 100
+PAit = 1/4
+num_ann = 5
+TassoInfra = TassoAnnuale * PAit
+num_rate = (PAit)^-1 * num_ann
+quota_capitale = entita_fin/num_rate
+debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
+quota_interessi = TassoInfra * debito_residuo %>% 
   append(FALSE, after =0)
 rata = quota_capitale + quota_interessi
+rata = rata[-length(rata)]
+rata[1] = 0
+totale_interessi = sum(quota_interessi)
+totale_rata = sum(rata)
 
-data = tibble(tasso = rep(tasso,9),
-            quota_capitale = rep(quota_capitale,9),
-            debito_residuo = debito_residuo,
-            quota_interessi= quota_interessi[-length(quota_interessi)],
-            rata = rata[-length(rata)])
-
-
-output$Dataset = DT::renderDataTable({
-  
-  
-  tasso = 0.003
-  entita_fin = 20000
-  PAit = 4
-  num_ann = 20
-  num_rate = PAit * num_ann
-  tipo_amm = c('all\'italiana', 'alla francese')
-  quota_capitale = entita_fin/num_rate
-  quota_interessi = quota_capitale * tasso
-  debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
-  quota_interessi = tasso * debito_residuo %>% 
-    append(FALSE, after =0)
-  rata = quota_capitale + quota_interessi
-  
-  dt = tibble(tasso = rep(tasso,num_rate +1),
-              quota_capitale = rep(quota_capitale,num_rate+1),
-              debito_residuo = debito_residuo,
-              quota_interessi= quota_interessi[-length(quota_interessi)],
-              rata = rata[-length(rata)]
-  )
-  
-  DT::datatable(data = dt, 
-                options = list(orderClasses = TRUE))
-
-
-
+dt = tibble(TassoInfra = rep(TassoInfra,num_rate +1),
+            TassoAnnuale = rep(1:num_ann,len = num_rate+1, each = (PAit)^-1 ),
+            quota_capitale = round(rep(quota_capitale,num_rate+1),2),
+            debito_residuo = round(debito_residuo,2),
+            quota_interessi= round(quota_interessi[-length(quota_interessi)],2),
+            rata = round(rata,2)
+)
 ###################################################
 ###################################################
 

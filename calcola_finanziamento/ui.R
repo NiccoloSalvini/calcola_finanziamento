@@ -79,7 +79,7 @@ shinyUI(
                 
                 numericInput("ANNIfr",
                              label = h3("N° Anni"),
-                             value = 1),
+                             value = 10),
                 
                 
                 numericInput(inputId = "tassofr", label = h3("Tasso di Interesse"), 

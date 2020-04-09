@@ -43,29 +43,65 @@ shinyServer(function(input, output, session) {
             # gli input dello user
             output$Dataset = DT::renderDataTable({
                 
+                if (input$selection == "Ammortamento alla Italiana") {
+                    tasso = (input$tassoit)/100
+                    entita_fin = input$entita_finanziamento
+                    PAit = as.numeric(input$PAit)
+                    num_ann = input$ANNIit
+                    num_rate = PAit * num_ann
+                    quota_capitale = entita_fin/num_rate
+                    quota_interessi = quota_capitale * tasso/100
+                    debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
+                    quota_interessi = tasso * debito_residuo %>% 
+                        append(FALSE, after =0)
+                    rata = quota_capitale + quota_interessi
+                    
+                    dt = tibble(tasso = rep(tasso,num_rate +1),
+                                quota_capitale = rep(quota_capitale,num_rate+1),
+                                debito_residuo = debito_residuo,
+                                quota_interessi= quota_interessi[-length(quota_interessi)],
+                                rata = rata[-length(rata)]
+                    )
+                    DT::datatable(data = dt,
+                                  filter = 'none',
+                                  caption = tags$caption("Struttura Finanaziamento dell'Amm Italiano "),
+                                  rownames = T,
+                                  options = list(orderClasses = TRUE,
+                                                 scrollCollapse = T,
+                                                 pageLength = 20)
+                                  )    
+                }
+                else {
+                    
+                    tasso = input$tassofr
+                    entita_fin = input$entita_finanziamento
+                    PAfr = as.numeric(input$PAfr)
+                    num_ann = input$ANNIfr
+                    num_rate = PAfr * num_ann
+                    quota_capitale = entita_fin/num_rate
+                    quota_interessi = quota_capitale * tasso
+                    debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
+                    quota_interessi = tasso * debito_residuo %>% 
+                        append(FALSE, after =0)
+                    rata = quota_capitale + quota_interessi
+                    
+                    dt = tibble(tasso = rep(tasso,num_rate +1),
+                                quota_capitale = rep(quota_capitale,num_rate+1),
+                                debito_residuo = debito_residuo,
+                                quota_interessi= quota_interessi[-length(quota_interessi)],
+                                rata = rata[-length(rata)])
+                    
+                    DT::datatable(data = dt,
+                                  filter = 'none',
+                                  caption = tags$caption("Struttura Finanaziamento dell'Amm Francese"),
+                                  rownames = T,
+                                  options = list(orderClasses = TRUE,
+                                                 scrollCollapse = T,
+                                                 pageLength = 20)
+                    ) 
+                    
+                }
                 
-                tasso = input$tassoit
-                entita_fin = input$entita_finanziamento
-                PAit = as.numeric(input$PAit)
-                num_ann = input$ANNIit
-                num_rate = PAit * num_ann
-                tipo_amm = c('all\'italiana', 'alla francese')
-                quota_capitale = entita_fin/num_rate
-                quota_interessi = quota_capitale * tasso
-                debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
-                quota_interessi = tasso * debito_residuo %>% 
-                    append(FALSE, after =0)
-                rata = quota_capitale + quota_interessi
-                
-                dt = tibble(tasso = rep(tasso,num_rate +1),
-                              quota_capitale = rep(quota_capitale,num_rate+1),
-                              debito_residuo = debito_residuo,
-                              quota_interessi= quota_interessi[-length(quota_interessi)],
-                              rata = rata[-length(rata)]
-                )
-                              
-                DT::datatable(data = dt, 
-                              options = list(orderClasses = TRUE))
             })
             
             #qui metto la parte del download della struttura del prestito
@@ -108,7 +144,7 @@ shinyServer(function(input, output, session) {
                 tab$Data = tab$Data %>% 
                     dmy()
                 
-                DT::datatable(data = tab, 
+                DT::datatable(data = tab,
                               options = list(orderClasses = TRUE))
                 
                     })
@@ -173,7 +209,9 @@ shinyServer(function(input, output, session) {
                     str_replace_all('\\%','') %>% 
                     str_replace_all('\\,','.') %>%
                     as.numeric()
-                
+                # non rieco ad implementare i diversi data set
+                # posso provare ad avere un unico dataset e poi 
+                # filtrare per un determinato input
                 plot_ly(AlMese, 
                         x = ~Data, 
                         y = ~Tasso) %>% 

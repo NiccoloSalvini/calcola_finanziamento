@@ -26,13 +26,14 @@ shinyUI(
               titlePanel(title=div(img(src="https://www.facile.it/img_a/zuzu/bianche/soldi_big.png",
                                        height = '15%',
                                        width = '15%'),
-                                   "Ti Spiego il Finanziamento")),
+                                   "Ti Spiego il Finanziamento"),
+                         windowTitle = 'CalFin APP'),
 
     sidebarLayout(
-        sidebarPanel(
-            
-            numericInput(inputId = "entita_finanziamento",
-                         label = h3("Entità Finanziamento"), 
+            sidebarPanel(
+                
+                numericInput(inputId = "entita_finanziamento",
+                             label = h3("Entità Finanziamento €"), 
                          value = 20000,
                          step = 100),
             
@@ -59,12 +60,12 @@ shinyUI(
                 
                 # numero di anni che dura finanziamento
                 numericInput("ANNIit",
-                             label = h3("N° Anni"),
+                             label = h3("Durata in Anni"),
                              value = 10),
                 
                 # tasso che posso valutare di spostare fuori dal conditional 
                 numericInput(inputId = "tassoit", 
-                             label = h3("Tasso di Interesse in %"),
+                             label = h3("TAN % (Tasso di Interesse Annuo) "),
                              value = 1.55,
                              min = -1,
                              max = 10,
@@ -84,12 +85,12 @@ shinyUI(
                              selected = 1),
                 
                 numericInput("ANNIfr",
-                             label = h3("N° Anni"),
+                             label = h3("Durata in Anni"),
                              value = 10),
                 
                 
                 numericInput(inputId = "tassofr",
-                             label = h3("Tasso di Interesse %"), 
+                             label = h3("TAN %(Tasso di Interesse Annuo) "), 
                              value = 1.55,
                              min = -1,
                              max = 10,
@@ -113,23 +114,30 @@ shinyUI(
                          verbatimTextOutput("square-root-alt"),
                          hr(),
                          # qui con MathJAx butto giù le formule di tutti e due gli ammortamenti
-                         # qui all'ITALIANA
-                         p(h2(strong("All'ITALIANA")), style = 'color:blue'),
+                         
+                         #### qui all'ITALIANA in regime SEMPLICE
+                         p(h2(strong("All'ITALIANA"))),
+                         p(h2(strong("In regime Semplice"))),
                          helpText("L'ammortamento con quote capitali costanti (ammortamento italiano) 
                                   prevede che ciascuna quota di ammortamento (supposto che le rate siano equintervallate ed n sia il numero di periodi previsti per l'ammortamento) 
                                   sia costante e pagata in via posticipata."),
                          withMathJax(),
+                         helpText('$$EF = Entità Finaziamento$$'),
                          helpText('$$A = NumeroAnni$$'),
                          helpText('$$PA = PartiAnno$$'),
-                         helpText('$$Numero di Rate = PartiAnno \\cdot NumeroAnni$$'),
-                         helpText('$$Quota Capitale =  \\frac{Entità Finanziamento}{Numero di Rate}$$'),
-                         helpText('$$QuotaInteressi_{t} =  QuotaCapitale_{t-1}\\cdot Tasso$$'),
-                         helpText('$$Debito Residuo_{t} =  EntitàFinanziamento - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
+                         helpText('$$IntAnn = Tasso Interesse Annuale$$'),
+                         helpText('$$TassoInfra = IntAnn \\cdot PA^-1 $$'),
+                         helpText('$$Num Anni = NumeroDiAnniFinanziamento$$'),
+                         helpText('$$Num Rat = Num Anni \\cdot PA$$'),
+                         helpText('$$Quota Capitale =  \\frac{EA}{Num Rat}$$'),
+                         helpText('$$QuotaInteressi_{t} =  QuotaCapitale_{t-1}\\cdot Tasso Infra$$'),
+                         helpText('$$Debito Residuo_{t} =  EA - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
                          helpText('$$Rata_{t} = QuotaCapitale_{t} + Quota Interessi_{t}$$'),
                          hr(),
                          
-                         # qui all'FRANCESE 
-                         p(h2(strong("Alla FRANCESE")), style = 'color:red'),
+                         ### qui all'FRANCESE regime SEMPLICE
+                         p(h2(strong("Alla FRANCESE"))),
+                         p(h2(strong("In regime Semplice"))),
                          helpText("L'ammortamento francese prevede che le rate siano posticipate e che la somma ricevuta dal debitore all'inizio (t = 0) sia il valore attuale di una rendita a rate costanti. Ciascuna rata è comprensiva di
                          parte del capitale (quota capitale) ed i relativi interessi (quota interessi) calcolati sul
                                   capitale residuo non ancora restituito (debito residuo). Tale metodo è alternativo ai metodi di calcolocon rata anticipata e ai metodi italiano e tedesco a quota capitale costante e rata variabile."),
@@ -143,15 +151,35 @@ shinyUI(
                          helpText('$$Debito Residuo_{t} =  EntitàFinanziamento - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
                          hr(),
                          
+                         ### qui ALL' ITALIANA in regime COMPOSTO W
+                         p(h2(strong("All'ITALIANA"))),
+                         p(h2(strong("In regime Composto"))),
+                         helpText("L'ammortamento con quote capitali costanti (ammortamento italiano) 
+                                  prevede che ciascuna quota di ammortamento (supposto che le rate siano equintervallate ed n sia il numero di periodi previsti per l'ammortamento) 
+                                  sia costante e pagata in via posticipata."),
+                         withMathJax(),
+                         helpText('$$EF = Entità Finaziamento$$'),
+                         helpText('$$A = NumeroAnni$$'),
+                         helpText('$$PA = PartiAnno$$'),
+                         helpText('$$IntAnn = Tasso Interesse Annuale$$'),
+                         helpText('$$TassoInfra = (1 + IntAnn)^{PA} -1  $$'),
+                         helpText('$$Num Anni = NumeroDiAnniFinanziamento$$'),
+                         helpText('$$Num Rat = Num Anni \\cdot PA^{-1}$$'),
+                         helpText('$$Quota Capitale =  \\frac{EA}{Num Rat}$$'),
+                         helpText('$$QuotaInteressi_{t} =  QuotaCapitale_{t-1}\\cdot Tasso Infra$$'),
+                         helpText('$$Debito Residuo_{t} =  EA - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
+                         helpText('$$Rata_{t} = QuotaCapitale_{t} + Quota Interessi_{t}$$'),
+                         hr(),
+                         
+                         
+                         
                          ),
                 
                 #qui si crea la terza tab e ci metto le tabelle da esportare1
-                tabPanel("Dataset", 
+                tabPanel("Struttura", 
                          icon = icon('table'),
-                         p(em('Term structure of the financial operation
-                              base on the', strong('left side'), em('inputs'))),
-                         hr(),
-                         DT::dataTableOutput('Dataset'),
+                         p(),
+                         DT::dataTableOutput('Struttura'),
                          hr(),
                          downloadButton(outputId ="Download",
                                         label = "Download .csv",

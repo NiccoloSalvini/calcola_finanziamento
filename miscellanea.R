@@ -11,6 +11,11 @@ header.true <- function(df) {
   df[-1,]
 }
 
+            # TASSO ITALIANO
+######################################################
+######################################################
+
+
 TassoAnnuale = 10/100
 entita_fin = 100
 PAit = 1/4
@@ -34,8 +39,53 @@ dt = tibble(TassoInfra = rep(TassoInfra,num_rate +1),
             quota_interessi= round(quota_interessi[-length(quota_interessi)],2),
             rata = round(rata,2)
 )
+
+
 ###################################################
 ###################################################
+
+
+
+
+          # TASSO FRANCESE
+######################################################
+######################################################
+
+
+
+TassoAnnuale = 5/100
+entita_fin = 8000
+PAfr = 1/4
+num_ann = 3
+TassoInfra = (1+ TassoAnnuale)^PAfr -1
+num_rate = (PAfr)^-1 * num_ann
+rata = rep(entita_fin / ((1 - (1+TassoInfra)^-num_ann)/TassoInfra), num_rate)
+
+quota_interessi = entita_fin * TassoInfra
+quota_capitale = entita_fin - quota_interessi
+debito_residuo = entita_fin - quota_capitale
+rata = rata[-length(rata)]
+
+# trovi i marginali 
+totale_interessi = sum(quota_interessi)
+totale_rata = sum(rata)
+
+dt = tibble(TassoInfra = round(rep(TassoInfra,num_rate +1),4),
+            AnnoCorrente = rep(1:num_ann,len = num_rate+1, each = (PAit)^-1 ),
+            quota_capitale = round(rep(quota_capitale,num_rate+1),2),
+            debito_residuo = round(debito_residuo,2),
+            quota_interessi= round(quota_interessi[-length(quota_interessi)],2),
+            rata = round(rata,2))
+
+
+
+
+######################################################
+######################################################
+
+
+
+
 
 
 tags$link(rel = "icon",
@@ -107,4 +157,3 @@ allanno$TassoAnn = allanno$TassoAnn %>%
 
 completo = cbind(algiorno,almese,allanno)
 
-  

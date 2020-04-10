@@ -39,9 +39,10 @@ shinyServer(function(input, output, session) {
             hist(dt$tasso,dt$debito_residuo)
             
             
-            # qui renderizza la tabella sulla base degli input, prima lo faccio senza 
-            # gli input dello user
-            output$Dataset = DT::renderDataTable({
+            # qui renderizza la parte Dataset con tutte le combinazioni
+            # di possibili finanziameneti e tassi
+            
+            output$Struttura = DT::renderDataTable({
                 
                 if (input$selection == "Ammortamento alla Italiana" & input$selectionRegime == "Regime Interesse Semplice") {
                     TassoAnnuale = (input$tassoit)/100
@@ -58,12 +59,13 @@ shinyServer(function(input, output, session) {
                     rata = rata[-length(rata)]
                     totale_interessi = sum(quota_interessi)
                     totale_rata = sum(rata)
-                    dt = tibble(TassoInfra = round(rep(TassoInfra,num_rate +1),4),
-                                AnnoCorrente = rep(1:num_ann,len = num_rate+1, each = (PAit)^-1 ),
-                                quota_capitale = round(rep(quota_capitale,num_rate+1),2),
-                                debito_residuo = round(debito_residuo,2),
-                                quota_interessi= round(quota_interessi[-length(quota_interessi)],2),
-                                rata = round(rata,2))
+                    dt = tibble('Numero Rata' = 0:num_rate,
+                                'Tasso Infra%' = round(rep(TassoInfra,num_rate +1),4),
+                                'Anno Corrente' = c(0,rep(1:num_ann,len = num_rate, each = (PAit)^-1)),
+                                'Quota Capitale' = round(rep(quota_capitale,num_rate+1),2),
+                                'Debito Residuo' = round(debito_residuo,2),
+                                'Quota Interessi'= round(quota_interessi[-length(quota_interessi)],2),
+                                'Rata' = round(rata,2))
                     
                     # Qui trasformo la prima riga
                     # di modo che sia coerente col Fin
@@ -73,11 +75,18 @@ shinyServer(function(input, output, session) {
                     DT::datatable(data = dt,
                                   filter = 'none',
                                   caption = tags$caption("Struttura Amm Ita Sem "),
-                                  rownames = T,
+                                  rownames = F,
                                   options = list(orderClasses = TRUE,
                                                  scrollCollapse = T,
                                                  pageLength = 20)
-                                  )    
+                                  ) %>%
+                        formatCurrency(c('Quota Capitale', 'Debito Residuo', 'Quota Interessi', 'Rata'),'\U20AC')%>% 
+                        formatPercentage('Tasso Infra%',2) %>%
+                        formatStyle('Numero Rata',  
+                                    color = 'red',
+                                    backgroundColor = 'teal',
+                                    fontWeight = 'bold',
+                                    textAlign = 'center')
                 }
                 else if (input$selection == "Ammortamento alla Italiana" & input$selectionRegime == "Regime Interesse Composto") {
                     
@@ -95,12 +104,52 @@ shinyServer(function(input, output, session) {
                     rata = rata[-length(rata)]
                     totale_interessi = sum(quota_interessi)
                     totale_rata = sum(rata)
-                    dt = tibble(TassoInfra = round(rep(TassoInfra,num_rate +1),4),
-                                AnnoCorrente = rep(1:num_ann,len = num_rate+1, each = (PAit)^-1 ),
-                                quota_capitale = round(rep(quota_capitale,num_rate+1),2),
-                                debito_residuo = round(debito_residuo,2),
-                                quota_interessi= round(quota_interessi[-length(quota_interessi)],2),
-                                rata = round(rata,2))
+                    dt = tibble('Numero Rata' = 0:num_rate,
+                                'Tasso Infra%' = round(rep(TassoInfra,num_rate +1),4),
+                                'Anno Corrente' = rep(1:num_ann,len = num_rate+1, each = (PAit)^-1 ),
+                                'Quota Capitale' = round(rep(quota_capitale,num_rate+1),2),
+                                'Debito Residuo' = round(debito_residuo,2),
+                                'Quota Interessi'= round(quota_interessi[-length(quota_interessi)],2),
+                                'Rata' = round(rata,2))
+                    
+                    # Qui trasformo la prima riga
+                    # di modo che sia coerente col Fin
+                    
+                    dt[1,] = 0 
+                    dt[1,4] = entita_fin
+                    
+                    DT::datatable(data = dt,
+                                  filter = 'none',
+                                  caption = tags$caption("Struttura Amm Ita Comp"),
+                                  rownames = F,
+                                  options = list(orderClasses = TRUE,
+                                                 scrollCollapse = T,
+                                                     pageLength = 20)) 
+                    
+                }
+                else if (input$selection == "Ammortamento alla Francese" & input$selectionRegime == "Regime Interesse Semplice"){
+                    
+                    TassoAnnuale = (input$tassofr)/100
+                    entita_fin = input$entita_finanziamento
+                    PAit = as.numeric(input$PAfr)
+                    num_ann = input$ANNIfr
+                    TassoInfra = TassoAnnuale * PAfr
+                    num_rate = (PAfr)^-1 * num_ann
+                    quota_capitale = entita_fin/num_rate
+                    debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
+                    quota_interessi = TassoInfra * debito_residuo %>% 
+                        append(FALSE, after =0)
+                    rata = quota_capitale + quota_interessi
+                    rata = rata[-length(rata)]
+                    totale_interessi = sum(quota_interessi)
+                    totale_rata = sum(rata)
+                    dt = tibble('Numero Rata' = 0:num_rate,
+                                'Tasso Infra%' = round(rep(TassoInfra,num_rate +1),4),
+                                'Anno Corrente' = rep(1:num_ann,len = num_rate+1, each = (PAit)^-1 ),
+                                'Quota Capitale' = round(rep(quota_capitale,num_rate+1),2),
+                                'Debito Residuo' = round(debito_residuo,2),
+                                'Quota Interessi'= round(quota_interessi[-length(quota_interessi)],2),
+                                'Rata' = round(rata,2))
                     
                     # Qui trasformo la prima riga
                     # di modo che sia coerente col Fin
@@ -109,24 +158,66 @@ shinyServer(function(input, output, session) {
                     
                     DT::datatable(data = dt,
                                   filter = 'none',
-                                  caption = tags$caption("Struttura Amm Ita Comp"),
-                                  rownames = T,
+                                  caption = tags$caption("Struttura Amm Fra Sem"),
+                                  rownames = F,
                                   options = list(orderClasses = TRUE,
                                                  scrollCollapse = T,
-                                                 pageLength = 20)) 
+                                                 pageLength = 20))                    
+                    
                     
                 }
-                
+                else if(input$selection == "Ammortamento alla Francese" & input$selectionRegime == "Regime Interesse Composto"){
+                    
+                    TassoAnnuale = (input$tassofr)/100
+                    entita_fin = input$entita_finanziamento
+                    PAfr = as.numeric(input$PAfr)
+                    num_ann = input$ANNIfr
+                    TassoInfra = (1+ TassoAnnuale)^PAfr -1
+                    num_rate = (PAfr)^-1 * num_ann
+                    rata = rep(entita_fin / ((1 - (1+TassoInfra)^num_ann)/TassoInfra), num_rate)
+                    
+                    quota_interessi = entita_fin * TassoInfra    
+                    quota_capitale = entita_fin - quota_interessi
+                    debito_residuo = entita_fin -quota_capitale
+                    rata = rata[-length(rata)]
+                    
+                    # trovi i marginali 
+                    totale_interessi = sum(quota_interessi)
+                    totale_rata = sum(rata)
+                    
+                    dt = tibble('Numero Rata' = 0:num_rate,
+                                'Tasso Infra%' = round(rep(TassoInfra,num_rate +1),4),
+                                'Anno Corrente' = rep(1:num_ann,len = num_rate+1, each = (PAit)^-1 ),
+                                'Quota Capitale' = round(rep(quota_capitale,num_rate+1),2),
+                                'Debito Residuo' = round(debito_residuo,2),
+                                'Quota Interessi'= round(quota_interessi[-length(quota_interessi)],2),
+                                'Rata' = round(rata,2))
+                    
+                    # Qui trasformo la prima riga
+                    # di modo che sia coerente col Fin
+                    dt[1,] = 0 
+                    dt[1,4] = entita_fin
+                    
+                    DT::datatable(data = dt,
+                                  filter = 'none',
+                                  caption = tags$caption("Struttura Amm Fra Comp"),
+                                  rownames = F,
+                                  options = list(orderClasses = TRUE,
+                                                 scrollCollapse = T,
+                                                 pageLength = 20))  
+                    
+                    
+                }
             })
             
             #qui metto la parte del download della struttura del prestito
             
             output$Download <- downloadHandler(
                 filename = function() {
-                    paste0(output$Dataset, Sys.Date(), ".csv")
+                    paste0(output$Struttura, Sys.Date(), ".csv")
                 },
                 content = function(file) {
-                    vroom::vroom_write(output$Dataset, file)
+                    vroom::vroom_write(output$Struttura, file)
                 }
             )
             

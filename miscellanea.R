@@ -16,29 +16,28 @@ header.true <- function(df) {
 ######################################################
 
 
-TassoAnnuale = 10/100
-entita_fin = 100
+
+TassoAnnuale = 3/100
+entita_fin = 20000
 PAit = 1/4
-num_ann = 5
+num_ann = 10
 TassoInfra = TassoAnnuale * PAit
 num_rate = (PAit)^-1 * num_ann
 quota_capitale = entita_fin/num_rate
 debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
-quota_interessi = TassoInfra * debito_residuo %>% 
+quota_interessi = TassoInfra * debito_residuo %>%
   append(FALSE, after =0)
 rata = quota_capitale + quota_interessi
 rata = rata[-length(rata)]
-rata[1] = 0
 totale_interessi = sum(quota_interessi)
 totale_rata = sum(rata)
-
-dt = tibble(TassoInfra = rep(TassoInfra,num_rate +1),
-            TassoAnnuale = rep(1:num_ann,len = num_rate+1, each = (PAit)^-1 ),
-            quota_capitale = round(rep(quota_capitale,num_rate+1),2),
-            debito_residuo = round(debito_residuo,2),
-            quota_interessi= round(quota_interessi[-length(quota_interessi)],2),
-            rata = round(rata,2)
-)
+dt = tibble('Numero Rata' = 0:num_rate,
+            'Tasso Infra%' = round(rep(TassoInfra,num_rate +1),4),
+            'Anno Corrente' = c(0,rep(1:num_ann,len = num_rate, each = (PAit)^-1)),
+            'Quota Capitale' = round(rep(quota_capitale,num_rate+1),2),
+            'Debito Residuo' = round(debito_residuo,2),
+            'Quota Interessi'= round(quota_interessi[-length(quota_interessi)],2)
+            )
 
 
 ###################################################
@@ -102,9 +101,8 @@ windowTitle = 'CalFin APP'
 # inizializzo url e query css
 url1 = 'https://www.euribor-rates.eu/it/tassi-euribor-aggiornati/2/euribor-tasso-3-mesi/'
 css = '.col-lg-4 .card-body'
-NamesGio = c('Data','TassoGio')
-NamesMes = c('Data','TassoMes')
-NamesAnn = c('Data','TassoAnn')
+Names = c('Data','Tasso')
+
 
 # prendo tabellone con tutti e tre dataset  
 tabellone = url1 %>%
@@ -115,12 +113,12 @@ tabellone = url1 %>%
 # e pulisco togliendo percentuale e converto a data
 algiorno = tabellone[[1]] %>% 
   as_tibble() %>%
-  set_names(NamesGio)
+  set_names(Names)
 
 algiorno$Data = algiorno$Data %>% 
   dmy()
 
-algiorno$TassoGio = algiorno$TassoGio %>%
+algiorno$Tasso = algiorno$Tasso %>%
   str_replace_all('\\%','') %>% 
   str_replace_all('\\,','.') %>%
   as.numeric()
@@ -129,12 +127,12 @@ algiorno$TassoGio = algiorno$TassoGio %>%
 # e pulisco togliendo percentuale e converto a data
 almese = tabellone[[2]] %>% 
   as_tibble() %>% 
-  set_names(NamesMes)
+  set_names(Names)
 
 almese$Data = almese$Data %>% 
   dmy()
 
-almese$TassoMes = almese$TassoMes %>%
+almese$Tasso = almese$Tasso %>%
   str_replace_all('\\%','') %>% 
   str_replace_all('\\,','.') %>%
   as.numeric()
@@ -144,12 +142,12 @@ almese$TassoMes = almese$TassoMes %>%
 # e pulisco togliendo percentuale e converto a data
 allanno = tabellone[[3]] %>%
   as_tibble() %>% 
-  set_names(NamesAnn)
+  set_names(Names)
 
 allanno$Data = allanno$Data %>% 
   dmy()
 
-allanno$TassoAnn = allanno$TassoAnn %>%
+allanno$Tasso = allanno$Tasso %>%
   str_replace_all('\\%','') %>% 
   str_replace_all('\\,','.') %>%
   as.numeric()

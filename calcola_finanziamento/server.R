@@ -1,15 +1,3 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
-library(shiny)
-library(shinyWidgets)
-
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
     
@@ -18,25 +6,28 @@ shinyServer(function(input, output, session) {
         # qui renderizza il plot della distributizone    
         output$distPlot = renderPlot({
     
-            tasso = input$tassoit
+            TassoAnnuale = (input$tassoit)/100
             entita_fin = input$entita_finanziamento
-            PAit = input$PAit
+            PAit = as.numeric(input$PAit)
             num_ann = input$ANNIit
-            tipo_amm = c('all\'italiana', 'alla francese')
-            quota_capitale = entita_fin/num_ann
-            quota_interessi = quota_capitale * tasso
-            debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_ann))))
-            quota_interessi = tasso * debito_residuo %>% 
+            TassoInfra = TassoAnnuale * PAit
+            num_rate = (PAit)^-1 * num_ann
+            quota_capitale = entita_fin/num_rate
+            debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
+            quota_interessi = TassoInfra * debito_residuo %>% 
                 append(FALSE, after =0)
             rata = quota_capitale + quota_interessi
-            
-            dt = tibble(tasso = rep(tasso,num_ann +1),
-                        quota_capitale = rep(quota_capitale,num_ann+1),
-                        debito_residuo = debito_residuo,
-                        quota_interessi= quota_interessi[-length(quota_interessi)],
-                        rata = rata[-length(rata)]
-            )
-            hist(dt$tasso,dt$debito_residuo)
+            rata = rata[-length(rata)]
+            totale_interessi = sum(quota_interessi)
+            totale_rata = sum(rata)
+            dt = tibble('Numero Rata' = 0:num_rate,
+                        'Tasso Infra%' = round(rep(TassoInfra,num_rate +1),4),
+                        'Anno Corrente' = c(0,rep(1:num_ann,len = num_rate, each = (PAit)^-1)),
+                        'Quota Capitale' = round(rep(quota_capitale,num_rate+1),2),
+                        'Debito Residuo' = round(debito_residuo,2),
+                        'Quota Interessi'= round(quota_interessi[-length(quota_interessi)],2),
+                        'Rata' = round(rata,2))
+            hist(dt$`Tasso Infra%`,dt$`Debito Residuo`)
             
             
             # qui renderizza la parte Dataset con tutte le combinazioni
@@ -78,15 +69,11 @@ shinyServer(function(input, output, session) {
                                   rownames = F,
                                   options = list(orderClasses = TRUE,
                                                  scrollCollapse = T,
-                                                 pageLength = 20)
-                                  ) %>%
+                                                 pageLength = 20)) %>%
                         formatCurrency(c('Quota Capitale', 'Debito Residuo', 'Quota Interessi', 'Rata'),'\U20AC')%>% 
                         formatPercentage('Tasso Infra%',2) %>%
-                        formatStyle('Numero Rata',  
-                                    color = 'red',
-                                    backgroundColor = 'teal',
-                                    fontWeight = 'bold',
-                                    textAlign = 'center')
+                        formatStyle('Numero Rata', color = 'red',backgroundColor = 'teal',fontWeight = 'bold',textAlign = 'center')
+                    
                 }
                 else if (input$selection == "Ammortamento alla Italiana" & input$selectionRegime == "Regime Interesse Composto") {
                     
@@ -127,6 +114,7 @@ shinyServer(function(input, output, session) {
                                                      pageLength = 20)) 
                     
                 }
+                
                 else if (input$selection == "Ammortamento alla Francese" & input$selectionRegime == "Regime Interesse Semplice"){
                     
                     TassoAnnuale = (input$tassofr)/100
@@ -263,65 +251,66 @@ shinyServer(function(input, output, session) {
             
             output$p = renderPlotly({
                 
-                
-                url1 = 'https://www.euribor-rates.eu/it/tassi-euribor-aggiornati/2/euribor-tasso-3-mesi/'
-                css = '.col-lg-4 .card-body'
-                Names = c('Data','Tasso')
-
-                # prendo tabellone con tutti e tre dataset  
-                tabellone = url1 %>%
-                    read_html() %>% 
-                    html_table()
-                
-                # qui prendo la sublist [[1]] che corrisponde ai dati al giorno
-                # e pulisco togliendo percentuale e converto a data
-                AlGiorno = tabellone[[1]] %>% 
-                    as_tibble() %>%
-                    set_names(Names)
-                
-                AlGiorno$Data = AlGiorno$Data %>% 
-                    dmy()
-                
-                AlGiorno$Tasso = AlGiorno$Tasso %>%
-                    str_replace_all('\\%','') %>% 
-                    str_replace_all('\\,','.') %>%
-                    as.numeric()
-                
-                # qui prendo la sublist [[2]] che corrisponde ai dati al mese
-                # e pulisco togliendo percentuale e converto a data
-                AlMese = tabellone[[2]] %>% 
-                    as_tibble() %>% 
-                    set_names(Names)
-                
-                AlMese$Data = AlMese$Data %>% 
-                    dmy()
-                
-                AlMese$Tasso = AlMese$Tasso %>%
-                    str_replace_all('\\%','') %>% 
-                    str_replace_all('\\,','.') %>%
-                    as.numeric()
-                
-                
-                # qui prendo la sublist [[3]] che corrisponde ai dati al anno
-                # e pulisco togliendo percentuale e converto a data
-                AllAnno = tabellone[[3]] %>%
-                    as_tibble() %>% 
-                    set_names(Names)
-                
-                AllAnno$Data = AllAnno$Data %>% 
-                    dmy()
-                
-                AllAnno$Tasso = AllAnno$Tasso %>%
-                    str_replace_all('\\%','') %>% 
-                    str_replace_all('\\,','.') %>%
-                    as.numeric()
-                # non rieco ad implementare i diversi data set
-                # posso provare ad avere un unico dataset e poi 
-                # filtrare per un determinato input
-                plot_ly(AlMese, 
-                        x = ~Data, 
-                        y = ~Tasso) %>% 
-                    add_lines()
+                    
+                    url1 = 'https://www.euribor-rates.eu/it/tassi-euribor-aggiornati/2/euribor-tasso-3-mesi/'
+                    css = '.col-lg-4 .card-body'
+                    Names = c('Data','Tasso')
+    
+                    # prendo tabellone con tutti e tre dataset  
+                    tabellone = url1 %>%
+                        read_html() %>% 
+                        html_table()
+                    
+                    # qui prendo la sublist [[1]] che corrisponde ai dati al giorno
+                    # e pulisco togliendo percentuale e converto a data
+                    AlGiorno = tabellone[[1]] %>% 
+                        as_tibble() %>%
+                        set_names(Names)
+                    
+                    AlGiorno$Data = AlGiorno$Data %>% 
+                        dmy()
+                    
+                    AlGiorno$Tasso = AlGiorno$Tasso %>%
+                        str_replace_all('\\%','') %>% 
+                        str_replace_all('\\,','.') %>%
+                        as.numeric()
+                    
+                    # qui prendo la sublist [[2]] che corrisponde ai dati al mese
+                    # e pulisco togliendo percentuale e converto a data
+                    AlMese = tabellone[[2]] %>% 
+                        as_tibble() %>% 
+                        set_names(Names)
+                    
+                    AlMese$Data = AlMese$Data %>% 
+                        dmy()
+                    
+                    AlMese$Tasso = AlMese$Tasso %>%
+                        str_replace_all('\\%','') %>% 
+                        str_replace_all('\\,','.') %>%
+                        as.numeric()
+                    
+                    
+                    # qui prendo la sublist [[3]] che corrisponde ai dati al anno
+                    # e pulisco togliendo percentuale e converto a data
+                    AllAnno = tabellone[[3]] %>%
+                        as_tibble() %>% 
+                        set_names(Names)
+                    
+                    AllAnno$Data = AllAnno$Data %>% 
+                        dmy()
+                    
+                    AllAnno$Tasso = AllAnno$Tasso %>%
+                        str_replace_all('\\%','') %>% 
+                        str_replace_all('\\,','.') %>%
+                        as.numeric()
+                    # non rieco ad implementare i diversi data set
+                    # posso provare ad avere un unico dataset e poi 
+                    # filtrare per un determinato input
+                    
+                    plot_ly(AllAnno, 
+                            x = ~Data,
+                            y = ~Tasso) %>%
+                        add_lines()
             })
         
         })

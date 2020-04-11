@@ -16,6 +16,8 @@ library(shinydashboard)
 library(vroom)
 library(janitor)
 library(purrr)
+library(shiny)
+library(shinyWidgets)
 
 
 
@@ -102,13 +104,14 @@ shinyUI(
         # Show a plot of the generated distribution
         mainPanel(
             tabsetPanel(
-                #qui si crea la prima tab e ci metto i plots
+                
+                #   qui si crea la prima tab e ci metto i plots
                 tabPanel("Plot",
                          plotOutput("distPlot"),
                          icon = icon('drafting-compass')
                          ),
                 
-                #qui si crea la seconda tab e ci metto le informazioni discorsive
+                #   qui si crea la seconda tab e ci metto le informazioni discorsive
                 tabPanel("Financial Math basis",
                          icon = icon('square-root-alt'),
                          verbatimTextOutput("square-root-alt"),

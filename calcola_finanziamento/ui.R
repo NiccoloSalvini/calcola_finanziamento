@@ -49,9 +49,8 @@ shinyUI(
             
             # condizionale all'ITALIANA
             conditionalPanel( 
-                condition = "input.selection == 'Ammortamento alla Italiana' || input.selectionRegime == 'Regime Interesse Semplice'",
+                condition = "input.selection == 'Ammortamento alla Italiana'",
                 helpText(em("> Ammortamento selezionato:"),strong("All'Italiana")),
-                helpText(em("> Regime Interessi:"),strong("Semplice")),
                 
                 # parti anno per fin
                 radioButtons("PAit",
@@ -59,7 +58,7 @@ shinyUI(
                              choices = list("Mensile" = 1/12, "Trimestrale" = 1/4, 'Quadrimestrale' = 1/3,
                                             "Semestrale" = 1/2, "Annuale" = 1),
                              selected = 1),
-                
+                    
                 # numero di anni che dura finanziamento
                 numericInput("ANNIit",
                              label = h3("Durata in Anni"),
@@ -128,13 +127,13 @@ shinyUI(
                          helpText('$$EF = Entità Finaziamento$$'),
                          helpText('$$A = NumeroAnni$$'),
                          helpText('$$PA = PartiAnno$$'),
-                         helpText('$$IntAnn = Tasso Interesse Annuale$$'),
-                         helpText('$$TassoInfra = IntAnn \\cdot PA^-1 $$'),
+                         helpText('$$TAN = Tasso Interesse Annuale$$'),
+                         helpText('$$TassoInfra = IntAnn \\cdot PA^{-1} $$'),
                          helpText('$$Num Anni = NumeroDiAnniFinanziamento$$'),
                          helpText('$$Num Rat = Num Anni \\cdot PA$$'),
-                         helpText('$$Quota Capitale =  \\frac{EA}{Num Rat}$$'),
+                         helpText('$$Quota Capitale =  \\frac{EF}{Num Rat}$$'),
                          helpText('$$QuotaInteressi_{t} =  QuotaCapitale_{t-1}\\cdot Tasso Infra$$'),
-                         helpText('$$Debito Residuo_{t} =  EA - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
+                         helpText('$$Debito Residuo_{t} =  EF - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
                          helpText('$$Rata_{t} = QuotaCapitale_{t} + Quota Interessi_{t}$$'),
                          hr(),
                          
@@ -145,16 +144,18 @@ shinyUI(
                          parte del capitale (quota capitale) ed i relativi interessi (quota interessi) calcolati sul
                                   capitale residuo non ancora restituito (debito residuo). Tale metodo è alternativo ai metodi di calcolocon rata anticipata e ai metodi italiano e tedesco a quota capitale costante e rata variabile."),
                          withMathJax(),
+                         helpText('$$EF = Entità Finaziamento$$'),
                          helpText('$$A = NumeroAnni$$'),
                          helpText('$$PA = PartiAnno$$'),
-                         helpText('$$TAN = tasso \\cdot PA$$'),
-                         helpText('$$Rata = Entità Finanziamento\\cdot (1 + \\frac{TAN} {PA})^{PA \\cdot A}  \\cdot \\frac{\\frac{TAN}{PA}}{(1 + \\frac{TAN} {PA})^{PA \\cdot A} -1}$$'),
-                         helpText('$$Quota Capitale_{t} = QuotaInteressi_{t} + Rata_{t}$$'),
-                         helpText('$$QuotaInteressi_{t} =  Debito Residuo_{t-1}\\cdot Tasso$$'),
-                         helpText('$$Debito Residuo_{t} =  EntitàFinanziamento - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
+                         helpText('$$TAN = TassoAnnualeNetto$$'),
+                         helpText('$$TassoInfra = TAN \\cdot PA$$'),
+                         helpText('$$Rata = \\frac{EF}{ \\frac{1 - (1+TassoInfra)^{-A}}{TassoInfra} }$$'),
+                         helpText('$$QuotaInteressi_{t} =  Debito Residuo_{t-1}\\cdot TassoInfra$$'),
+                         helpText('$$Quota Capitale_{t} = Rata  - QuotaInteressi_{t}$$'),
+                         helpText('$$Debito Residuo_{t} =  Debito Residuo_{t-1} - Quota Capitale_{t} $$'),
                          hr(),
                          
-                         ### qui ALL' ITALIANA in regime COMPOSTO W
+                         ### qui ALL' ITALIANA in regime COMPOSTO 
                          p(h2(strong("All'ITALIANA"))),
                          p(h2(strong("In regime Composto"))),
                          helpText("L'ammortamento con quote capitali costanti (ammortamento italiano) 
@@ -175,6 +176,22 @@ shinyUI(
                          hr(),
                          
                          
+                         ### qui all'FRANCESE regime COMPOSTO
+                         p(h2(strong("Alla FRANCESE"))),
+                         p(h2(strong("In regime Composto"))),
+                         helpText("L'ammortamento francese prevede che le rate siano posticipate e che la somma ricevuta dal debitore all'inizio (t = 0) sia il valore attuale di una rendita a rate costanti. Ciascuna rata è comprensiva di
+                         parte del capitale (quota capitale) ed i relativi interessi (quota interessi) calcolati sul
+                                  capitale residuo non ancora restituito (debito residuo). Tale metodo è alternativo ai metodi di calcolocon rata anticipata e ai metodi italiano e tedesco a quota capitale costante e rata variabile."),
+                         withMathJax(),
+                         helpText('$$EF = Entità Finaziamento$$'),
+                         helpText('$$A = NumeroAnni$$'),
+                         helpText('$$PA = PartiAnno$$'),
+                         helpText('$$TAN = TassoAnnualeNetto$$'),
+                         helpText('$$TassoInfra = (1 + IntAnn)^{PA} -1 $$'),
+                         helpText('$$Rata = \\frac{EF}{ \\frac{1 - (1+TassoInfra)^{-A}}{TassoInfra} }$$'),
+                         helpText('$$QuotaInteressi_{t} =  Debito Residuo_{t-1}\\cdot TassoInfra$$'),
+                         helpText('$$Quota Capitale_{t} = Rata  - QuotaInteressi_{t}$$'),
+                         helpText('$$Debito Residuo_{t} =  Debito Residuo_{t-1} - Quota Capitale_{t} $$'),
                          
                          ),
                 
@@ -182,11 +199,9 @@ shinyUI(
                 tabPanel("Struttura", 
                          icon = icon('table'),
                          p(),
+                         #single download type  
                          DT::dataTableOutput('Struttura'),
-                         hr(),
-                         downloadButton(outputId ="Download",
-                                        label = "Download .csv",
-                                        class = "btn-secondary")
+                         hr(), 
                          ),
                 # qui faccio vedere i tassi di confronto EURIBOR 
                 tabPanel("Tassi", 

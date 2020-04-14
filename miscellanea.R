@@ -77,6 +77,99 @@ dt = tibble(TassoInfra = round(rep(TassoInfra,num_rate +1),4),
             rata = round(rata,2))
 
 
+TassoInfra = (1+ TassoAnnuale)^PAfr -1
+num_rate = (PAfr)^-1 * num_ann
+mat = matrix(ncol = 4, nrow = num_rate +1);mat
+mat[,2] = rata
+mat[1,] = 0
+mat[1] = entita_fin;mat
+for (i in seq(2,nrow(mat))) {
+  mat[i,3] = mat[i-1,1] * TassoInfra
+  mat[i,4] = mat[i,2] - mat[i,3]
+  mat[i,1] = mat[i-1,1] - mat[i,4]
+  
+};mat
+mat = mat %>%
+  as_tibble() %>% 
+  rename_at(vars(starts_with("V"), 
+                 funs(str_replace(., "Arr", "Arrival"))))
+
+
+
+
+
+nomi = c("Debito Residuo", "Rate"," Quota Interessi" ,"Quota Capitale")
+
+
+mat = mat %>%
+  as_tibble() %>% 
+  mutate('Numero Rata' = seq(0:num_rate)) %>% 
+  mutate('Tasso Infra%' = round(TassoInfra,4)) %>%  
+  mutate('Anno Corrente' = rep(1:num_ann,len = num_rate+1, each = (PAfr)^-1))
+
+
+mat[1] = entita_fin;mat
+mat[2,3] = mat[1,1] * TassoAnnuale
+mat[2,4] = mat[2,2] - mat[2,3]
+mat[2,1] = mat[1,1] - mat[2,4]
+# iterazione 2
+mat[3,3] = mat[2,1] * TassoAnnuale
+mat[3,4] = mat[3,2] - mat[3,3]
+mat[3,1] = mat[2,1] - mat[3,4]
+# iterazione 3
+mat[4,3] = mat[3,1] * TassoAnnuale
+mat[4,4] = mat[4,2] - mat[4,3]
+mat[4,1] = mat[3,1] - mat[4,4]
+# iterazione 4
+mat[5,3] = mat[4,1] * TassoAnnuale
+mat[5,4] = mat[5,2] - mat[5,3]
+mat[5,1] = mat[4,1] - mat[5,4]
+
+
+
+
+TassoAnnuale = 8/100
+entita_fin = 40000000
+PAfr = 1/4
+num_ann = 2
+TassoInfra = (1 + TassoAnnuale)^PAfr -1
+num_rate = (PAfr)^-1 * num_ann
+rata = entita_fin / ((1 - (1+TassoInfra)^-num_rate)/TassoInfra)
+
+mat = matrix(ncol = 4, nrow = num_rate +1)
+mat[,2] = rata
+mat[1,] = 0
+mat[1] = entita_fin
+for (i in seq(2,nrow(mat))) {
+  mat[i,3] = mat[i-1,1] * TassoInfra
+  mat[i,4] = mat[i,2] - mat[i,3]
+  mat[i,1] = mat[i-1,1] - mat[i,4]
+}
+nomi = c("Debito Residuo", "Rata"," Quota Interessi" ,"Quota Capitale")
+colnames(mat) = nomi
+mat = mat %>%
+  as_tibble() %>% 
+  mutate('Numero Rata' = 0:num_rate) %>% 
+  mutate('Tasso Infra%' = round(TassoInfra,4)) %>%  
+  mutate('Anno Corrente' = c(0,rep(1:num_ann,len = num_rate, each = (PAfr)^-1))) 
+
+
+DT::datatable(data = mat,
+              filter = 'none',
+              caption = tags$caption("Struttura Amm Fra Sem"),
+              rownames = F,
+              options = list(orderClasses = TRUE,
+                             scrollCollapse = T,
+                             pageLength = 20))
+
+
+
+  formatCurrency(c('Quota Capitale', 'Debito Residuo', 'Quota Interessi', 'Rata'),'\U20AC')%>% 
+  formatPercentage('Tasso Infra%',2) %>%
+  formatStyle('Numero Rata', color = 'red',backgroundColor = 'teal',fontWeight = 'bold',textAlign = 'center')
+
+
+
 
 
 ######################################################

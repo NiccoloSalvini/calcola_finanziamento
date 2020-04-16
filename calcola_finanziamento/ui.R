@@ -16,13 +16,12 @@ library(shinydashboard)
 library(vroom)
 library(janitor)
 library(purrr)
-library(shiny)
-library(shinyWidgets)
+library(scales)
 
 
 
 
-# Define UI for application that draws a histogram
+    # Define UI for application that draws a histogram
 shinyUI(
     fluidPage(theme = shinytheme("cerulean"),
               titlePanel(title=div(img(src="https://www.facile.it/img_a/zuzu/bianche/soldi_big.png",
@@ -30,6 +29,13 @@ shinyUI(
                                        width = '15%'),
                                    "Ti Spiego il Finanziamento"),
                          windowTitle = 'CalFin APP'),
+              
+              
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+                                #SIDE BAR
+
 
     sidebarLayout(
             sidebarPanel(
@@ -100,20 +106,26 @@ shinyUI(
             
             ),
 
+            
+#######################################################################################################
+#######################################################################################################
+#######################################################################################################
+                                  #MAIN 
+            
+            
         # Show a plot of the generated distribution
         mainPanel(
             tabsetPanel(
                 
                 #   qui si crea la prima tab e ci metto i plots
-                tabPanel("Plot",
-                         plotOutput("distPlot"),
-                         icon = icon('drafting-compass')
+                tabPanel("Informazioni",
+                         icon = icon('info-circle'),
+                         valueBoxOutput("vbox"),
                          ),
                 
                 #   qui si crea la seconda tab e ci metto le informazioni discorsive
                 tabPanel("Financial Math basis",
                          icon = icon('square-root-alt'),
-                         verbatimTextOutput("square-root-alt"),
                          hr(),
                          # qui con MathJAx butto giù le formule di tutti e due gli ammortamenti
                          

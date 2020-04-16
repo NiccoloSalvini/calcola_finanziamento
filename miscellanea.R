@@ -153,6 +153,35 @@ mat = mat %>%
   mutate('Tasso Infra%' = round(TassoInfra,4)) %>%  
   mutate('Anno Corrente' = c(0,rep(1:num_ann,len = num_rate, each = (PAfr)^-1))) 
 
+tab = tibble('Numero Rata' = 0:num_rate,
+            'Tasso Infra%' = round(TassoInfra,4),
+            'Anno Corrente' = c(0,rep(1:num_ann,len = num_rate, each = (PAfr)^-1)),
+            'Quota Capitale' = mat$`Quota Capitale`,
+            'Debito Residuo' = mat$`Debito Residuo`,
+            'Quota Interessi' = mat$` Quota Interessi`,
+            'Rata' = mat$Rata) 
+            
+            
+
+            
+DT::datatable(data = tab,
+              filter = 'none',
+              caption = tags$caption("REGIME DI INTERESSI SEMPLICE"),
+              rownames = F,
+              options = list(orderClasses = TRUE,
+                             scrollCollapse = T,
+                             pageLength = 20)) %>%
+  formatCurrency(c('Quota Capitale', 'Debito Residuo', 'Quota Interessi', 'Rata'),'\U20AC')%>% 
+  formatPercentage('Tasso Infra%',2) %>%
+  formatStyle('Numero Rata', color = 'red',backgroundColor = 'teal',fontWeight = 'bold',textAlign = 'center')
+
+  
+  
+  
+  
+  
+  
+)
 
 DT::datatable(data = mat,
               filter = 'none',
@@ -160,11 +189,7 @@ DT::datatable(data = mat,
               rownames = F,
               options = list(orderClasses = TRUE,
                              scrollCollapse = T,
-                             pageLength = 20))
-
-
-
-  formatCurrency(c('Quota Capitale', 'Debito Residuo', 'Quota Interessi', 'Rata'),'\U20AC')%>% 
+                             pageLength = 20)) %>%  formatCurrency(c('Quota Capitale', 'Debito Residuo', 'Quota Interessi', 'Rata'),'\U20AC')%>% 
   formatPercentage('Tasso Infra%',2) %>%
   formatStyle('Numero Rata', color = 'red',backgroundColor = 'teal',fontWeight = 'bold',textAlign = 'center')
 

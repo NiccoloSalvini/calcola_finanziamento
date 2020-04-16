@@ -1,5 +1,7 @@
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
+    
+    
     REF1 = a("OsservatorioS24O", href="https://mutuionline.24oreborsaonline.ilsole24ore.com/guide-mutui/euribor.asp")
     euro = dollar_format(prefix = "", suffix = "\u20ac")
     observe({
@@ -37,7 +39,7 @@ shinyServer(function(input, output, session) {
                 # qui totale RATA singola
                 valueBox(
                     value = tags$p(euro(rata[2]), style = "font-size: 150%;"),
-                    subtitle = tags$p("Totale interessi richiesti", style = "font-size: 150%;"),
+                    subtitle = tags$p("", style = "font-size: 150%;"),
                     icon = icon("info")
                 )
 
@@ -364,112 +366,6 @@ shinyServer(function(input, output, session) {
                     
                 }
             })
-        
-        output$Tassi = DT::renderDataTable({
-                
-                url = 'https://mutuionline.24oreborsaonline.ilsole24ore.com/guide-mutui/euribor.asp'
-                VettoreTasso = url  %>%
-                    read_html(verbose = 1) %>%
-                    html_nodes('.tabellaosservatorio:nth-child(5) td:nth-child(3) , .tabellaosservatorio:nth-child(5) 
-                               td:nth-child(2) , .tabellaosservatorio:nth-child(5) td:nth-child(1)') %>% 
-                    html_text() %>%
-                    str_squish()
-                
-                # initialize matrix
-                tab = matrix(VettoreTasso, ncol = 3,nrow = 5 ,byrow  = T)
-                
-                # creation of the tibble
-                tab = tab %>%
-                    as.tibble() %>% 
-                    set_names(tab[1,]) %>% 
-                    slice(-1)
-                
-                # fixing col types
-                tab$Fixing = tab$Fixing %>% 
-                    str_replace_all('\\%','') %>% 
-                    str_replace_all('\\,','.') %>%
-                    as.numeric()
-                    
-                tab$Data = tab$Data %>% 
-                    dmy()
-                
-                DT::datatable(data = tab,
-                              options = list(orderClasses = TRUE))
-                
-                    })
-            
-            
-            output$tab = renderUI({
-                tagList("Here the source:", REF1)
-            })
-            
-            
-            
-            
-            output$p = renderPlotly({
-                
-                    
-                    url1 = 'https://www.euribor-rates.eu/it/tassi-euribor-aggiornati/2/euribor-tasso-3-mesi/'
-                    css = '.col-lg-4 .card-body'
-                    Names = c('Data','Tasso')
-    
-                    # prendo tabellone con tutti e tre dataset  
-                    tabellone = url1 %>%
-                        read_html() %>% 
-                        html_table()
-                    
-                    # qui prendo la sublist [[1]] che corrisponde ai dati al giorno
-                    # e pulisco togliendo percentuale e converto a data
-                    AlGiorno = tabellone[[1]] %>% 
-                        as_tibble() %>%
-                        set_names(Names)
-                    
-                    AlGiorno$Data = AlGiorno$Data %>% 
-                        dmy()
-                    
-                    AlGiorno$Tasso = AlGiorno$Tasso %>%
-                        str_replace_all('\\%','') %>% 
-                        str_replace_all('\\,','.') %>%
-                        as.numeric()
-                    
-                    # qui prendo la sublist [[2]] che corrisponde ai dati al mese
-                    # e pulisco togliendo percentuale e converto a data
-                    AlMese = tabellone[[2]] %>% 
-                        as_tibble() %>% 
-                        set_names(Names)
-                    
-                    AlMese$Data = AlMese$Data %>% 
-                        dmy()
-                    
-                    AlMese$Tasso = AlMese$Tasso %>%
-                        str_replace_all('\\%','') %>% 
-                        str_replace_all('\\,','.') %>%
-                        as.numeric()
-                    
-                    
-                    # qui prendo la sublist [[3]] che corrisponde ai dati al anno
-                    # e pulisco togliendo percentuale e converto a data
-                    AllAnno = tabellone[[3]] %>%
-                        as_tibble() %>% 
-                        set_names(Names)
-                    
-                    AllAnno$Data = AllAnno$Data %>% 
-                        dmy()
-                    
-                    AllAnno$Tasso = AllAnno$Tasso %>%
-                        str_replace_all('\\%','') %>% 
-                        str_replace_all('\\,','.') %>%
-                        as.numeric()
-                    # non rieco ad implementare i diversi data set
-                    # posso provare ad avere un unico dataset e poi 
-                    # filtrare per un determinato input
-                    
-                    plot_ly(AllAnno, 
-                            x = ~Data,
-                            y = ~Tasso) %>%
-                        add_lines()
-            })
-        
         
     })
 

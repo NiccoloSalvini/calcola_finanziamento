@@ -115,97 +115,9 @@ shinyUI(
             
         # Show a plot of the generated distribution
         mainPanel(
-            tabsetPanel(
-                
-                #   qui si crea la prima tab e ci metto i plots
-                tabPanel("Informazioni",
-                         icon = icon('info-circle'),
-                         valueBoxOutput("vbox"),
-                         ),
                 
                 #   qui si crea la seconda tab e ci metto le informazioni discorsive
-                tabPanel("Financial Math basis",
-                         icon = icon('square-root-alt'),
-                         hr(),
-                         # qui con MathJAx butto giù le formule di tutti e due gli ammortamenti
-                         
-                         #### qui all'ITALIANA in regime SEMPLICE
-                         p(h2(strong("All'ITALIANA"))),
-                         p(h2(strong("In regime Semplice"))),
-                         helpText("L'ammortamento con quote capitali costanti (ammortamento italiano) 
-                                  prevede che ciascuna quota di ammortamento (supposto che le rate siano equintervallate ed n sia il numero di periodi previsti per l'ammortamento) 
-                                  sia costante e pagata in via posticipata."),
-                         withMathJax(),
-                         helpText('$$EF = Entità Finaziamento$$'),
-                         helpText('$$A = NumeroAnni$$'),
-                         helpText('$$PA = PartiAnno$$'),
-                         helpText('$$TAN = Tasso Interesse Annuale$$'),
-                         helpText('$$TassoInfra = IntAnn \\cdot PA^{-1} $$'),
-                         helpText('$$Num Anni = NumeroDiAnniFinanziamento$$'),
-                         helpText('$$Num Rat = Num Anni \\cdot PA$$'),
-                         helpText('$$Quota Capitale =  \\frac{EF}{Num Rat}$$'),
-                         helpText('$$QuotaInteressi_{t} =  QuotaCapitale_{t-1}\\cdot Tasso Infra$$'),
-                         helpText('$$Debito Residuo_{t} =  EF - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
-                         helpText('$$Rata_{t} = QuotaCapitale_{t} + Quota Interessi_{t}$$'),
-                         hr(),
-                         
-                         ### qui all'FRANCESE regime SEMPLICE
-                         p(h2(strong("Alla FRANCESE"))),
-                         p(h2(strong("In regime Semplice"))),
-                         helpText("L'ammortamento francese prevede che le rate siano posticipate e che la somma ricevuta dal debitore all'inizio (t = 0) sia il valore attuale di una rendita a rate costanti. Ciascuna rata è comprensiva di
-                         parte del capitale (quota capitale) ed i relativi interessi (quota interessi) calcolati sul
-                                  capitale residuo non ancora restituito (debito residuo). Tale metodo è alternativo ai metodi di calcolocon rata anticipata e ai metodi italiano e tedesco a quota capitale costante e rata variabile."),
-                         withMathJax(),
-                         helpText('$$EF = Entità Finaziamento$$'),
-                         helpText('$$A = NumeroAnni$$'),
-                         helpText('$$PA = PartiAnno$$'),
-                         helpText('$$TAN = TassoAnnualeNetto$$'),
-                         helpText('$$TassoInfra = TAN \\cdot PA$$'),
-                         helpText('$$Rata = \\frac{EF}{ \\frac{1 - (1+TassoInfra)^{-A}}{TassoInfra} }$$'),
-                         helpText('$$QuotaInteressi_{t} =  Debito Residuo_{t-1}\\cdot TassoInfra$$'),
-                         helpText('$$Quota Capitale_{t} = Rata  - QuotaInteressi_{t}$$'),
-                         helpText('$$Debito Residuo_{t} =  Debito Residuo_{t-1} - Quota Capitale_{t} $$'),
-                         hr(),
-                         
-                         ### qui ALL' ITALIANA in regime COMPOSTO 
-                         p(h2(strong("All'ITALIANA"))),
-                         p(h2(strong("In regime Composto"))),
-                         helpText("L'ammortamento con quote capitali costanti (ammortamento italiano) 
-                                  prevede che ciascuna quota di ammortamento (supposto che le rate siano equintervallate ed n sia il numero di periodi previsti per l'ammortamento) 
-                                  sia costante e pagata in via posticipata."),
-                         withMathJax(),
-                         helpText('$$EF = Entità Finaziamento$$'),
-                         helpText('$$A = NumeroAnni$$'),
-                         helpText('$$PA = PartiAnno$$'),
-                         helpText('$$IntAnn = Tasso Interesse Annuale$$'),
-                         helpText('$$TassoInfra = (1 + IntAnn)^{PA} -1  $$'),
-                         helpText('$$Num Anni = NumeroDiAnniFinanziamento$$'),
-                         helpText('$$Num Rat = Num Anni \\cdot PA^{-1}$$'),
-                         helpText('$$Quota Capitale =  \\frac{EA}{Num Rat}$$'),
-                         helpText('$$QuotaInteressi_{t} =  QuotaCapitale_{t-1}\\cdot Tasso Infra$$'),
-                         helpText('$$Debito Residuo_{t} =  EA - \\sum_{i=1}^t{QuotaCapitale_{t-1}}$$'),
-                         helpText('$$Rata_{t} = QuotaCapitale_{t} + Quota Interessi_{t}$$'),
-                         hr(),
-                         
-                         
-                         ### qui all'FRANCESE regime COMPOSTO
-                         p(h2(strong("Alla FRANCESE"))),
-                         p(h2(strong("In regime Composto"))),
-                         helpText("L'ammortamento francese prevede che le rate siano posticipate e che la somma ricevuta dal debitore all'inizio (t = 0) sia il valore attuale di una rendita a rate costanti. Ciascuna rata è comprensiva di
-                         parte del capitale (quota capitale) ed i relativi interessi (quota interessi) calcolati sul
-                                  capitale residuo non ancora restituito (debito residuo). Tale metodo è alternativo ai metodi di calcolocon rata anticipata e ai metodi italiano e tedesco a quota capitale costante e rata variabile."),
-                         withMathJax(),
-                         helpText('$$EF = Entità Finaziamento$$'),
-                         helpText('$$A = NumeroAnni$$'),
-                         helpText('$$PA = PartiAnno$$'),
-                         helpText('$$TAN = TassoAnnualeNetto$$'),
-                         helpText('$$TassoInfra = (1 + IntAnn)^{PA} -1 $$'),
-                         helpText('$$Rata = \\frac{EF}{ \\frac{1 - (1+TassoInfra)^{-A}}{TassoInfra} }$$'),
-                         helpText('$$QuotaInteressi_{t} =  Debito Residuo_{t-1}\\cdot TassoInfra$$'),
-                         helpText('$$Quota Capitale_{t} = Rata  - QuotaInteressi_{t}$$'),
-                         helpText('$$Debito Residuo_{t} =  Debito Residuo_{t-1} - Quota Capitale_{t} $$'),
-                         
-                         ),
+              
                 
                 #qui si crea la terza tab e ci metto le tabelle da esportare1
                 tabPanel("Struttura", 
@@ -214,30 +126,10 @@ shinyUI(
                          #single download type  
                          DT::dataTableOutput('Struttura'),
                          hr(), 
-                         ),
+                         )
                 # qui faccio vedere i tassi di confronto EURIBOR 
-                tabPanel("Tassi", 
-                         icon = icon('sort-numeric-down'),
-                         p(h1(strong("EURIBOR"))),
-                         p(em("E' Tasso interbancario di riferimento diffuso giornalmente dalla Federazione Bancaria Europea come media ponderata dei
-                              tassi di interesse ai quali le Banche operanti nell'Unione Europea cedono i depositi in prestito.
-                              È utilizzato come parametro di indicizzazione dei mutui ipotecari a tasso variabile.")),
-                         strong('Questa tabella è aggiornata dinamicamente con cadenza giornaliera'),
-                         em('Ultimo aggioramento alla data:', Sys.Date()),
-                         p(uiOutput("tab")),
-                         hr(),
-                         DT::dataTableOutput('Tassi'),
-                         hr(),
-                         # qui dentro plotly
-                         selectizeInput(
-                             inputId = "tuttitassi", 
-                             label = h1("Seleziona Serie Storica Tasso"),
-                             choices = c('AlGiorno', 'AlMese', 'AllAnno')
-                         ),
-                         plotlyOutput(outputId = "p")
-                        )
+              
         )
-    )
     )
     )
     )

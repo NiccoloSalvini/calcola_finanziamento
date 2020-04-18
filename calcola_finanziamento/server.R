@@ -1,16 +1,24 @@
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
-    
-    
     REF1 = a("OsservatorioS24O", href="https://mutuionline.24oreborsaonline.ilsole24ore.com/guide-mutui/euribor.asp")
     euro = dollar_format(prefix = "", suffix = "\u20ac")
         
-        
         # qui renderizza la parte Dataset con tutte le combinazioni
         # di possibili finanziameneti e tassi
-     
+    
+        
+        
         output$Struttura = DT::renderDataTable({
-                
+
+            
+            ############################################################################
+            ############################################################################
+            ############################################################################
+                            # all'italiana 
+
+            
+            
+
                 if (input$selection == "Ammortamento alla Italiana" & input$selectionRegime == "Regime Interesse Semplice") {
                     TassoAnnuale = (input$tassoit)/100
                     entita_fin = input$entita_finanziamento
@@ -96,9 +104,15 @@ shinyServer(function(input, output, session) {
                                                  pageLength = 20)) %>%
                         formatCurrency(c('Quota Capitale', 'Debito Residuo', 'Quota Interessi', 'Rata'),'\U20AC')%>% 
                         formatPercentage('Tasso Infra%',2) %>%
-                        formatStyle('Numero Rata', color = 'red',backgroundColor = 'teal',fontWeight = 'bold',textAlign = 'center')
-                    
+                        formatStyle('Numero Rata', color = 'red',backgroundColor = 'teal',fontWeight = 'bold',textAlign = 'center')   
                 }
+            
+            
+            ############################################################################
+            ############################################################################
+            ############################################################################
+                            # alla francese
+            
                 
                 else if (input$selection == "Ammortamento alla Francese" & input$selectionRegime == "Regime Interesse Semplice"){
                     
@@ -166,7 +180,7 @@ shinyServer(function(input, output, session) {
                     rata = entita_fin / (((1 - (1+TassoInfra)^-num_rate))/TassoInfra)
                     
                     ## genero matrice che fillo con for loop
-                    ## metodo inefficace 
+                    ## metodo inefficace
                     
                     mat = matrix(ncol = 4, nrow = num_rate +1)
                     mat[,2] = rata
@@ -210,5 +224,7 @@ shinyServer(function(input, output, session) {
                     
                 }
             })
+            
         
-    })
+        
+})

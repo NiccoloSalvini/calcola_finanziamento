@@ -19,18 +19,13 @@ _this is has already been deployed even thougt it is not completed_
 
 
 
+## prossime features:
 
-### Road map:
-
-  - far vedere come è strutturato il finanziamento
-  - fammi vedere quanto debuto rimane ad un determianto tempo t
-  - invertire tabella nel primo panel e il primo panel nel terzo
-  - sistemare download button
-  - 
-  
-- plotta grafici
-  - andamento tasso di interesse
-  - andamento quota capitale
-  - andamento quota interessi 
-  - andamento debito residuo 
-  - comparazione con tassi d'interesse anatocismo 
+1. mettere griglia di importanti indicatori per finanziamento
+  1. TAE
+  2. TAEG
+  3. Totale interessi 
+  4. Importo rata
+2. ammoratamento tedesco e restituzione unica
+3. ottimizzazione performance tramite reactive dentro server
+4. mettere serie storica tassi completa 

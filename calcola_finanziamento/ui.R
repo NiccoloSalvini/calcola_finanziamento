@@ -68,7 +68,8 @@ shinyUI(
                 # numero di anni che dura finanziamento
                 numericInput("ANNIit",
                              label = h3("Durata in Anni"),
-                             value = 10),
+                             value = 10,
+                             min = 0),
                 
                 # tasso che posso valutare di spostare fuori dal conditional 
                 numericInput(inputId = "tassoit", 
@@ -93,7 +94,8 @@ shinyUI(
                 
                 numericInput("ANNIfr",
                              label = h3("Durata in Anni"),
-                             value = 10),
+                             value = 10,
+                             min = 0),
                 
                 
                 numericInput(inputId = "tassofr",

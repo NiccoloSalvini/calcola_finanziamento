@@ -4,7 +4,12 @@ simple shiny tool that computes financial information given the contract (`IN IT
 ---
 
 _this is has already been deployed even thougt it is not completed_
-----> deployment happens [`HERE`](http://niccolosalvini.shinyapps.io/calcola_finanziamento)
+deployment happens
+ <span style="font-size:larger;">[`HERE`](http://niccolosalvini.shinyapps.io/calcola_finanziamento)</span>
+
+
+
+------
 
 ### some snapshots from the _APP_
 
@@ -16,8 +21,7 @@ _this is has already been deployed even thougt it is not completed_
 ---
 ![img4](snaps/img4.PNG)
 
-
-
+----
 
 ## prossime features:
 

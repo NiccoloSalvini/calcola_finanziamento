@@ -203,12 +203,10 @@ DT::datatable(data = mat,
 
 
 
-
-
 tags$link(rel = "icon",
           type = "image/gif",
-          href = "https://guidetoiceland.is/image/389003/x/0/the-beautiful-waterfalls-of-south-iceland-seljalandsfoss-skogafoss-amp-gljufrabui-1.jpg"),
-title = "Ti Spiego il Finanziamento WEBAPP",
+          href = "https://guidetoiceland.is/image/389003/x/0/the-beautiful-waterfalls-of-south-iceland-seljalandsfoss-skogafoss-amp-gljufrabui-1.jpg")
+title = "Ti Spiego il Finanziamento WEBAPP"
 windowTitle = 'CalFin APP'
 
 
@@ -271,5 +269,24 @@ allanno$Tasso = allanno$Tasso %>%
   as.numeric()
 # qui faccio merge tutto insieme
 
-completo = cbind(algiorno,almese,allanno)
+
+
+
+##############################################################
+##############################################################
+##############################################################
+        # prova con dplyr 
+
+
+
+AlGiorno = tabellone[[1]] %>% 
+  as_tibble() %>%
+  set_names(Names)
+
+AlGiorno %>% filter('Data') %>% dmy()
+
+AlGiorno$Tasso = AlGiorno$Tasso %>%
+  str_replace_all('\\%','') %>% 
+  str_replace_all('\\,','.') %>%
+  as.numeric()
 

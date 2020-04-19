@@ -308,7 +308,7 @@ shinyServer(function(input, output, session) {
             
             
             output$tab = renderUI({
-                tagList("Here the source:", REF1)
+                tagList("Here It is the source:", REF1)
             })
             
             
@@ -329,6 +329,7 @@ shinyServer(function(input, output, session) {
                         y = ~Tasso) %>% 
                   add_lines()
               }
+              
               else{
                 plot_ly(tassiInputAnno(),
                         x = ~Data,

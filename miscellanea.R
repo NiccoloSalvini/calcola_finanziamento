@@ -40,6 +40,16 @@ dt = tibble('Numero Rata' = 0:num_rate,
             )
 
 
+# dove n = numero rate
+# dove n = numero rate
+
+
+
+
+plot(c(1:num_rate, dt$`Quota Interessi`/totale_interessi, xlab = "Period", ylab = "Percent",main = "Percentage of Payment\nToward Interest")
+lines(c(1:n, nk), table2[, "Interest Paid"]/table2[,"Payment"], col = "blue", lty = 2)
+
+
 ###################################################
 ###################################################
 
@@ -289,4 +299,54 @@ AlGiorno$Tasso = AlGiorno$Tasso %>%
   str_replace_all('\\%','') %>% 
   str_replace_all('\\,','.') %>%
   as.numeric()
+
+#################################
+################################
+###############################
+################################
+###############################
+
+
+# qui sto provando qualche PLOT e cquesto ci sta 
+TassoAnnuale = 3/100
+entita_fin = 20000
+PAit = 1/4
+num_ann = 10
+TassoInfra = TassoAnnuale * PAit
+num_rate = (PAit)^-1 * num_ann
+quota_capitale = entita_fin/num_rate
+debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
+quota_interessi = TassoInfra * debito_residuo %>%
+  append(FALSE, after =0)
+rata = quota_capitale + quota_interessi
+rata = rata[-length(rata)]
+totale_interessi = sum(quota_interessi)
+totale_rata = sum(rata)
+dt = tibble('Numero Rata' = 0:num_rate,
+            'Tasso Infra%' = round(rep(TassoInfra,num_rate +1),4),
+            'Anno Corrente' = c(0,rep(1:num_ann,len = num_rate, each = (PAit)^-1)),
+            'Quota Capitale' = round(rep(quota_capitale,num_rate+1),2),
+            'Debito Residuo' = round(debito_residuo,2),
+            'Quota Interessi'= round(quota_interessi[-length(quota_interessi)],2)
+)
+
+
+gain = dt$`Quota Interessi`/totale_interessi
+
+plot(0:num_rate,gain, xlab = "Periodo in rate", ylab = "Percent",main = "Percentage of Payment\nToward Interest")
+lines(0:num_rate, gain, , col = "blue", lty = 2)
+
+quota = dt$'Quota Interessi'
+totale = sum(dt$'Quota Interessi')
+Interessi_pagati = quota/totale
+tib = tibble('Quota' = quota,
+             'Interessi pagati' = Interessi_pagati,
+             'Rate' = num_rate,
+             'Numero Rata' = 0:num_rate)
+plot_ly(tib,
+        x = 'Numero Rata',
+        y  = 'Interessi pagati')
+
+
+
 

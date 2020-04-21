@@ -228,11 +228,7 @@ shinyUI(
                                               capitalizzazione'),
                                    helpText("dato che PA sta tra 0 e 1, visto che è definito come il rapporto tra numero delle rate all'anno 
                                             diviso 12"),                                  
-                                   helpText('$$TAE = ( 1 +  TAN \\cdot PA )^{PA^{-1}} -1$$'),                                  
-                                   
-                                  
-                                   
-                                   
+                                   helpText('$$TAE = ( 1 +  TAN \\cdot PA )^{PA^{-1}} -1$$'),
                                    
 
                                    

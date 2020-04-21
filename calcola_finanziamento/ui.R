@@ -123,6 +123,8 @@ shinyUI(
                                    fluidRow(column(width = 12,
                                                    valueBoxOutput("vbox", width = 2),
                                                    valueBoxOutput("vbox1", width = 2),
+                                                   valueBoxOutput("vbox2", width = 2),
+                                                   valueBoxOutput("vbox3", width = 2)
                                                    ),
                                             ),
                           ),
@@ -208,6 +210,31 @@ shinyUI(
                                    helpText('$$QuotaInteressi_{t} =  Debito Residuo_{t-1}\\cdot TassoInfra$$'),
                                    helpText('$$Quota Capitale_{t} = Rata  - QuotaInteressi_{t}$$'),
                                    helpText('$$Debito Residuo_{t} =  Debito Residuo_{t-1} - Quota Capitale_{t} $$'),
+                                   hr(),
+                                   
+                                   
+                                   
+                                   ### qui ci metto gli indicatori in una sorta di bibliografia
+                                   p(h2(strong("TAE"))),
+                                   p(h2(strong("In tuttir e due i regimi"))),
+                                   helpText('La lezione è che non si possono confrontare direttamente tassi di interesse
+                                            con diversi regimi di capitalizzazione, anche se relativi alla stessa scadenzaTassoAnnuo effettivo Inoltre, 
+                                            da quest’ultimo esempio si vede chiaramente che il metodo
+                                              dell’attualizzazione dei flussi di cassa ipotizza implicitamente il
+                                              reinvestimento dei flussi di cassa intermedi alle stesse condizioni
+                                              contrattuali di remunerazione … altrimenti non avrebbe alcun valore
+                                              percepire un flusso finanziario prima della scadenza. E’ necessario quindi
+                                              individuare un TAE che renda confrontabili i diversi regimi di
+                                              capitalizzazione'),
+                                   helpText("dato che PA sta tra 0 e 1, visto che è definito come il rapporto tra numero delle rate all'anno 
+                                            diviso 12"),                                  
+                                   helpText('$$TAE = ( 1 +  TAN \\cdot PA )^{PA^{-1}} -1$$'),                                  
+                                   
+                                  
+                                   
+                                   
+                                   
+
                                    
                           ),
                           
@@ -238,8 +265,17 @@ shinyUI(
                                        label = h1("Seleziona Serie Storica Tasso"),
                                        choices = c('AlGiorno', 'AlMese', 'AllAnno')
                                    ),
-                                   plotlyOutput(outputId = "p")
-                          )
+                                   plotlyOutput(outputId = "p"),
+                                   hr(),
+                          ),
+                          
+                          # qui metto i plot relativi alla struttura
+                          tabPanel("Plot", 
+                                   icon = icon('drafting-compass'),
+                                   p(),
+                                   plotlyOutput(outputId = "Plot"),
+                                   hr(),
+                                   )
                       )
                   )
               )

@@ -163,6 +163,143 @@ shinyServer(function(input, output, session) {
         
     })
     
+    ####################
+    ####################
+    ####################
+    ####################
+    # qui parte per dash iniziale
+    
+    dashInput = reactive({
+      
+      ############################################################################
+      ############################################################################
+      ############################################################################
+      # alla italiana
+      
+      if (input$selection == "Ammortamento alla Italiana" & input$selectionRegime == "Regime Interesse Semplice") {
+        TassoAnnuale = (input$tassoit)/100
+        entita_fin = input$entita_finanziamento
+        PAit = as.numeric(input$PAit)
+        num_ann = input$ANNIit
+        TassoInfra = TassoAnnuale * PAit
+        num_rate = (PAit)^-1 * num_ann
+        quota_capitale = entita_fin/num_rate
+        debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
+        quota_interessi = TassoInfra * debito_residuo %>% 
+          append(FALSE, after =0)
+        rata = quota_capitale + quota_interessi
+        rata = rata[-length(rata)]
+        # cover up the superfluous
+        rata[1] = 0
+        QC = rep(quota_capitale,num_rate+1)
+        QC[1] = 0
+        # other calculations that I will use after 
+        totale_interessi = sum(quota_interessi)
+        totale_rata = sum(rata)
+        TAE = TassoInfra
+          
+  
+      }
+      else if (input$selection == "Ammortamento alla Italiana" & input$selectionRegime == "Regime Interesse Composto") {
+        
+        TassoAnnuale = (input$tassoit)/100
+        entita_fin = input$entita_finanziamento
+        PAit = as.numeric(input$PAit)
+        num_ann = input$ANNIit
+        TassoInfra = (1+ TassoAnnuale)^PAit -1
+        num_rate = (PAit)^-1 * num_ann
+        quota_capitale = entita_fin/num_rate
+        debito_residuo = entita_fin - (cumsum(c(0,rep(quota_capitale,num_rate))))
+        quota_interessi = TassoInfra * debito_residuo %>% 
+          append(FALSE, after =0)
+        rata = quota_capitale + quota_interessi
+        rata = rata[-length(rata)]
+        # cover up the superfluous
+        rata[1] = 0
+        QC = rep(quota_capitale,num_rate+1)
+        QC[1] = 0
+        # other calculations that I will use after
+        totale_interessi = sum(quota_interessi)
+        totale_rata = sum(rata)
+        TAE = (1 + TassoAnnuale*PAit)^(PAit^-1) -1
+        
+      }
+      ############################################################################
+      ############################################################################
+      ############################################################################
+      # alla francese
+      
+      
+      else if (input$selection == "Ammortamento alla Francese" & input$selectionRegime == "Regime Interesse Semplice"){
+        
+        TassoAnnuale = (input$tassofr)/100
+        entita_fin = input$entita_finanziamento
+        PAfr = as.numeric(input$PAfr)
+        num_ann = input$ANNIfr
+        TassoInfra = TassoAnnuale * PAfr
+        num_rate = (PAfr)^-1 * num_ann
+        rata = entita_fin / (((1 - (1+TassoInfra)^-num_rate))/TassoInfra)
+        
+        ## genero matrice che fillo con for loop
+        ## metodo inefficace
+        
+        mat = matrix(ncol = 4, nrow = num_rate +1)
+        mat[,2] = rata
+        mat[1,] = 0
+        mat[1] = entita_fin
+        for (i in seq(2,nrow(mat))) {
+          mat[i,3] = mat[i-1,1] * TassoInfra
+          mat[i,4] = mat[i,2] - mat[i,3]
+          mat[i,1] = mat[i-1,1] - mat[i,4]
+        }
+        nomi = c("Debito Residuo", "Rata"," Quota Interessi" ,"Quota Capitale")
+        colnames(mat) = nomi
+        mat = mat %>%
+          as_tibble() %>% 
+          mutate('Numero Rata' = 0:num_rate) %>% 
+          mutate('Tasso Infra%' = round(TassoInfra,4)) %>%  
+          mutate('Anno Corrente' = c(0,rep(1:num_ann,len = num_rate, each = (PAfr)^-1)))
+        TAE = TassoInfra
+
+        
+      }
+      else if(input$selection == "Ammortamento alla Francese" & input$selectionRegime == "Regime Interesse Composto"){
+        
+        TassoAnnuale = (input$tassofr)/100
+        entita_fin = input$entita_finanziamento
+        PAfr = as.numeric(input$PAfr)
+        num_ann = input$ANNIfr
+        TassoInfra = (1 + TassoAnnuale)^PAfr -1
+        num_rate = (PAfr)^-1 * num_ann
+        rata = entita_fin / (((1 - (1+TassoInfra)^-num_rate))/TassoInfra)
+        
+        ## genero matrice che fillo con for loop
+        ## metodo inefficace
+        
+        mat = matrix(ncol = 4, nrow = num_rate +1)
+        mat[,2] = rata
+        mat[1,] = 0
+        mat[1] = entita_fin
+        for (i in seq(2,nrow(mat))) {
+          mat[i,3] = mat[i-1,1] * TassoInfra
+          mat[i,4] = mat[i,2] - mat[i,3]
+          mat[i,1] = mat[i-1,1] - mat[i,4]
+        }
+        nomi = c("Debito Residuo", "Rata"," Quota Interessi" ,"Quota Capitale")
+        colnames(mat) = nomi
+        mat = mat %>%
+          as_tibble() %>% 
+          mutate('Numero Rata' = 0:num_rate) %>% 
+          mutate('Tasso Infra%' = round(TassoInfra,4)) %>%  
+          mutate('Anno Corrente' = c(0,rep(1:num_ann,len = num_rate, each = (PAfr)^-1))) 
+        TAE = (1 + TassoAnnuale*PAfr)^(PAfr^-1) -1
+        
+        
+        
+      }
+      
+    })
+    
     url1 = 'https://www.euribor-rates.eu/it/tassi-euribor-aggiornati/2/euribor-tasso-3-mesi/'
     css = '.col-lg-4 .card-body'
     Names = c('Data','Tasso')
@@ -251,15 +388,15 @@ shinyServer(function(input, output, session) {
     })
     
     
-        
+        q
         output$vbox = renderValueBox({
 
             valueBox(
                 value = tags$p(euro(sum(dataInput()$'Quota Interessi')), style = "font-size: 150%;"),
                 subtitle = tags$p("Totale interessi richiesti", style = "font-size: 150%;"),
                 icon = icon("info")
-                ) 
-            })
+                )
+          })
         
         output$vbox1 = renderValueBox({
             
@@ -267,7 +404,26 @@ shinyServer(function(input, output, session) {
                 value = tags$p(euro(dataInput()$'Rata'[2]), style = "font-size: 150%;"),
                 subtitle = tags$p("Totale Rata da Pagare", style = "font-size: 150%;"),
                 icon = icon("info")
-            ) 
+            )
+          })
+        
+        output$vbox2 = renderValueBox({
+            
+            valueBox(
+              value = tags$p(dataInput()$'Numero Rata'[length(dataInput()$'Numero Rata')], style = "font-size: 150%;"),
+              subtitle = tags$p("Totale Numero delle Rate", style = "font-size: 150%;"),
+              icon = icon("money")
+            )
+          })
+        
+        output$vbox3 = renderValueBox({
+            
+          valueBox(
+         
+            value = tags$p(percent(dashInput()), style = "font-size: 150%;"),
+            subtitle = tags$p("TAE ", style = "font-size: 150%;"),
+            icon = icon("money")
+          )
         })
         
         
@@ -334,11 +490,26 @@ shinyServer(function(input, output, session) {
                 plot_ly(tassiInputAnno(),
                         x = ~Data,
                         y = ~Tasso) %>% 
-                  add_lines()
-                
-                
-                
+                  add_lines()  
               }
+              
+            })
+            
+            
+            output$Plot = renderPlotly({
+              #qui al giorno
+              quota = dataInput()$'Quota Interessi'
+              totale = sum(dataInput()$'Quota Interessi')
+              rapporto = quota/totale
+              rat = dataInput()$'Numero Rata'
+              tib = tibble('Rapporto' =  rapporto,
+                           'Rata' = rat)
+                plot_ly(tib[-1,],
+                        x = ~ Rata,
+                        y = ~ Rapporto) %>% 
+                  add_lines()
+             
+              
             })
 
 })

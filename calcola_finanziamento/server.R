@@ -379,6 +379,10 @@ shinyServer(function(input, output, session) {
                       extensions = 'Buttons',
                       options = list(orderClasses = TRUE,
                                      scrollCollapse = T,
+                                     initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#222222', 'color': '#fff'});",
+                                       "}"),
                                      pageLength = 20,
                                      dom = 'B<"dwnld">frtip',
                                      buttons = list('copy'))) %>%
@@ -458,7 +462,11 @@ shinyServer(function(input, output, session) {
                     dmy()
                 
                 DT::datatable(data = tab,
-                              options = list(orderClasses = TRUE))
+                              options = list(orderClasses = TRUE,
+                                             initComplete = JS(
+                                               "function(settings, json) {",
+                                               "$(this.api().table().header()).css({'background-color': '#222222', 'color': '#fff'});",
+                                               "}")))
                 
                     })
             

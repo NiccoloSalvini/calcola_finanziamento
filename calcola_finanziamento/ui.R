@@ -23,12 +23,8 @@ library(scales)
 
     # Define UI for application that draws a histogram
 shinyUI(
-    fluidPage(
-      tags$head(
-        tags$link(rel = "stylesheet", type = "text/css", href ="bootstrap.min.css")
-      ), 
-      
-              titlePanel(title=div(img(src="https://www.facile.it/img_a/zuzu/bianche/soldi_big.png",
+    fluidPage(theme = shinytheme("darkly"),
+      titlePanel(title=div(img(src="https://www.facile.it/img_a/zuzu/bianche/soldi_big.png",
                                        height = '15%',
                                        width = '15%'),
                                    "Ti Spiego il Finanziamento"),

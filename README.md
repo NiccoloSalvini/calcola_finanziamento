@@ -3,7 +3,7 @@ Calcola\_Finanziamento
 Niccolò Salvini
 27/4/2020
 
-<img src="Www/soldi.png" alt="drawing" width="139"/>
+<img src="www/soldi.png" alt="drawing" width="139"/>
 
 ## Deployment happens
 

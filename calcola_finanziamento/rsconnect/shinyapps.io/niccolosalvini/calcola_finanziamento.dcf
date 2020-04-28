@@ -5,8 +5,8 @@ account: niccolosalvini
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 2056353
-bundleId: 3045704
+bundleId: 3073984
 url: https://niccolosalvini.shinyapps.io/calcola_finanziamento/
-when: 1587493593.79208
+when: 1588022408.49928
 asMultiple: FALSE
 asStatic: FALSE

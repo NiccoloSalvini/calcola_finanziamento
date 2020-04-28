@@ -13,7 +13,7 @@ deployment happens
 
 ### some snapshots from the _APP_
 
-![img1](snaps/img1.PNG)
+![img1](https://recordit.co/HUa4Tf6adF)
 ---
 ![img2](snaps/img2.PNG)
 ---
